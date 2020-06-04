@@ -6,7 +6,7 @@ Attribute VB_Name = "Order"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 Option Explicit
 
 Const PLACE_ORDER_CMD As String = "PLACE_ORDER"
@@ -36,17 +36,20 @@ Public PublishTime As Date
 Private Sub Class_Initialize()
     
     Set Me.Variety = New Variety
-    Set Me.Amo = False
+    Set Me.TradeType = New TradeType
+    Set Me.OrderType = New OrderType
+    Set Me.ProductType = New ProductType
     Set Me.Validity = New Validity
-    Set Me.DisclosedQuantity = 0
-    Set Me.StrategyId = 0
-    Set Me.Comments = ""
-    Set Me.TriggerPrice = 0
-    Set Me.Price = 0
-    Set Me.Target = 0
-    Set Me.Stoploss = 0
-    Set Me.TrailingStoploss = 0
-    Set Me.PublishTime = Now
+    Amo = False
+    DisclosedQuantity = 0
+    StrategyId = 0
+    Comments = ""
+    TriggerPrice = 0
+    Price = 0
+    Target = 0
+    Stoploss = 0
+    TrailingStoploss = 0
+    PublishTime = Now
 
 End Sub
 

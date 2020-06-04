@@ -6,7 +6,7 @@ Attribute VB_Name = "Validity"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 Option Explicit
 Public Enum ValidityEnum
     DAY
@@ -36,7 +36,7 @@ Public Property Let Value(val As ValidityEnum)
 End Property
 
 Public Sub FromString(str As String)
-    Select Case Trim(UPPER(str))
+    Select Case Trim(UCase(str))
         Case "IOC": Me.Value = ValidityEnum.IOC
         Case Else: Me.Value = ValidityEnum.DAY
     End Select

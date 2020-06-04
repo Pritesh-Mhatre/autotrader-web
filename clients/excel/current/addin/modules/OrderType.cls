@@ -6,7 +6,7 @@ Attribute VB_Name = "OrderType"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 Option Explicit
 Public Enum OrderTypeEnum
     LIMIT
@@ -38,7 +38,7 @@ Public Property Let Value(val As OrderTypeEnum)
 End Property
 
 Public Sub FromString(str As String)
-    Select Case Trim(UPPER(str))
+    Select Case Trim(UCase(str))
         Case "M", "MARKET", "MKT": Me.Value = OrderTypeEnum.MARKET
                 Case "SL", "STOP_LOSS": Me.Value = OrderTypeEnum.STOP_LOSS
                 Case "SL-M", "SL_MARKET": Me.Value = OrderTypeEnum.SL_MARKET

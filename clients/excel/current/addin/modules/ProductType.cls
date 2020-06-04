@@ -6,7 +6,7 @@ Attribute VB_Name = "ProductType"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 Option Explicit
 Public Enum ProductTypeEnum
     INTRADAY
@@ -37,7 +37,7 @@ Public Property Let Value(val As ProductTypeEnum)
 End Property
 
 Public Sub FromString(str As String)
-    Select Case Trim(UPPER(str))
+    Select Case Trim(UCase(str))
         Case "I", "MIS", "INTRADAY": Me.Value = ProductTypeEnum.INTRADAY
                 Case "D", "CNC", "DELIVERY": Me.Value = ProductTypeEnum.DELIVERY
                 Case "NRML", "NORMAL": Me.Value = ProductTypeEnum.NORMAL

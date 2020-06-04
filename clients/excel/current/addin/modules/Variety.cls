@@ -6,7 +6,7 @@ Attribute VB_Name = "Variety"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 Option Explicit
 Public Enum VarietyEnum
     REGULAR
@@ -37,7 +37,7 @@ Public Property Let Value(val As VarietyEnum)
 End Property
 
 Public Sub FromString(str As String)
-    Select Case Trim(UPPER(str))
+    Select Case Trim(UCase(str))
         Case "CO": Me.Value = VarietyEnum.CO
         Case "BO": Me.Value = VarietyEnum.BO
         Case Else: Me.Value = VarietyEnum.REGULAR
