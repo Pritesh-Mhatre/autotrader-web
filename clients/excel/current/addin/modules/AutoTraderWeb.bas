@@ -15,6 +15,23 @@ Const MODIFY_ORDER_CMD As String = "MODIFY_ORDER"
 Public Const EPOCH As Date = #1/1/1970#
 Public Const BLANK As String = ""
 
+Private Sub Sleep(seconds As Integer)
+
+    Dim newHour As Integer
+    Dim newMinute As Integer
+    Dim newSecond As Integer
+    Dim waitTime As Date
+
+    newHour = Hour(Now())
+    newMinute = Minute(Now())
+    newSecond = Second(Now()) + seconds
+    waitTime = TimeSerial(newHour, newMinute, newSecond)
+    
+    Application.Wait waitTime
+
+End Sub
+
+
 Private Function NextOrderNumber() As String
 
     If ORDER_NUM = 0 Then
@@ -150,6 +167,9 @@ Public Function PlaceOrder(Variety As String, _
     o.StrategyId = StrategyId
 
     PlaceOrder = PlaceOrderInternal(o)
+    
+    ' Delay to avoid 'Too many requests' error
+    Sleep (1)
 
 End Function
 
