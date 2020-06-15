@@ -37,8 +37,8 @@ Sub PlaceOrders()
                 Exit For
             End If
             
-            Application.Run "PlaceOrder", wOrders.Cells(OrderRow, 1), temp, wOrders.Cells(OrderRow, 2), _
-                wOrders.Cells(OrderRow, 3), wOrders.Cells(OrderRow, 4), wOrders.Cells(OrderRow, 5), _
+            Application.Run "PlaceOrder", wOrders.Cells(OrderRow, 1), Trim(temp), Trim(wOrders.Cells(OrderRow, 2)), _
+                Trim(wOrders.Cells(OrderRow, 3)), wOrders.Cells(OrderRow, 4), wOrders.Cells(OrderRow, 5), _
                 wOrders.Cells(OrderRow, 6), wOrders.Cells(OrderRow, 7), wOrders.Cells(OrderRow, 8), _
                 wOrders.Cells(OrderRow, 9), wOrders.Cells(OrderRow, 13), "DAY", _
                 0, "", wOrders.Cells(OrderRow, 10), wOrders.Cells(OrderRow, 11), _
