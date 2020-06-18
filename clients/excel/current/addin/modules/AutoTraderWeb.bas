@@ -4,6 +4,8 @@ Option Explicit
 Dim ORDER_NUM As Integer
 Dim START_TIME As Long
 
+Const CONTACT_SUPPORT As String = "Please take a screenshot of this message and mail to help@stocksdeveloper.in"
+
 Const COMMANDS_FILE As String = "commands.csv"
 
 Const INPUT_DIR As String = "input"
@@ -99,7 +101,7 @@ End Sub
 Private Function PlaceOrderInternal(Order As Order) As String
     
     On Error GoTo Error_Handler
-    
+
     ' Assign a unique order id
     Order.PublisherId = NextOrderNumber()
     
@@ -112,7 +114,11 @@ Error_Handler:
     If Err.Number <> 0 Then
         
         Dim Message As String
-        Message = str(Err.Number) & Err.Description
+        Message = "The Error Happened on Line : " & Erl & vbNewLine & _
+                        "Error Message : " & Err.Description & vbNewLine & _
+                        "Error Number : " & Err.Number & vbNewLine & vbNewLine & _
+                        CONTACT_SUPPORT
+                
         MsgBox Message, vbOKOnly, "Error"
         Resume Next
 
@@ -194,8 +200,8 @@ Public Function PlaceOrder( _
     Price As Double, _
     TriggerPrice As Double) As String
         
-        Dim Variety As String: Variety = VARIETY_REGULAR
-        Dim Target As Double: Target = 0
+    Dim Variety As String: Variety = VARIETY_REGULAR
+    Dim Target As Double: Target = 0
     Dim Stoploss As Double: Stoploss = 0
     Dim TrailingStoploss As Double: TrailingStoploss = 0
     Dim DisclosedQuantity As Integer: DisclosedQuantity = 0
@@ -204,11 +210,11 @@ Public Function PlaceOrder( _
     Dim StrategyId As Integer: StrategyId = -1
     Dim Comments As String: Comments = ""
         
-        PlaceOrder = PlaceOrderAdvanced(Variety, PseudoAccount, _
-                Exchange, Symbol, TradeType, OrderType, ProductType, _
-                Quantity, Price, TriggerPrice, Target, Stoploss, _
-                TrailingStoploss, DisclosedQuantity, Validity, _
-                Amo, StrategyId, Comments)
+    PlaceOrder = PlaceOrderAdvanced(Variety, PseudoAccount, _
+            Exchange, Symbol, TradeType, OrderType, ProductType, _
+            Quantity, Price, TriggerPrice, Target, Stoploss, _
+            TrailingStoploss, DisclosedQuantity, Validity, _
+            Amo, StrategyId, Comments)
 
 End Function
         
@@ -225,19 +231,19 @@ Public Function PlaceBracketOrder( _
     Stoploss As Double, _
     TrailingStoploss As Double) As String
 
-        Dim Variety As String: Variety = VARIETY_BO
+    Dim Variety As String: Variety = VARIETY_BO
     Dim DisclosedQuantity As Integer: DisclosedQuantity = 0
     Dim Validity As String: Validity = VALIDITY_DEFAULT
     Dim Amo As Boolean: Amo = False
     Dim StrategyId As Integer: StrategyId = -1
     Dim Comments As String: Comments = ""
-        Dim ProductType As String: ProductType = PRODUCT_INTRADAY
+    Dim ProductType As String: ProductType = PRODUCT_INTRADAY
 
-        PlaceBracketOrder = PlaceOrderAdvanced(Variety, PseudoAccount, _
-                Exchange, Symbol, TradeType, OrderType, ProductType, _
-                Quantity, Price, TriggerPrice, Target, Stoploss, _
-                TrailingStoploss, DisclosedQuantity, Validity, _
-                Amo, StrategyId, Comments)
+    PlaceBracketOrder = PlaceOrderAdvanced(Variety, PseudoAccount, _
+            Exchange, Symbol, TradeType, OrderType, ProductType, _
+            Quantity, Price, TriggerPrice, Target, Stoploss, _
+            TrailingStoploss, DisclosedQuantity, Validity, _
+            Amo, StrategyId, Comments)
 
 End Function
 
@@ -251,22 +257,114 @@ Public Function PlaceCoverOrder( _
     Price As Double, _
     TriggerPrice As Double) As String
 
-        Dim Variety As String: Variety = VARIETY_CO
+    Dim Variety As String: Variety = VARIETY_CO
     Dim DisclosedQuantity As Integer: DisclosedQuantity = 0
     Dim Validity As String: Validity = VALIDITY_DEFAULT
     Dim Amo As Boolean: Amo = False
     Dim StrategyId As Integer: StrategyId = -1
     Dim Comments As String: Comments = ""
-        Dim ProductType As String: ProductType = PRODUCT_INTRADAY
-        Dim Target As Double: Target = 0
+    Dim ProductType As String: ProductType = PRODUCT_INTRADAY
+    Dim Target As Double: Target = 0
     Dim Stoploss As Double: Stoploss = 0
     Dim TrailingStoploss As Double: TrailingStoploss = 0
 
-        PlaceCoverOrder = PlaceOrderAdvanced(Variety, PseudoAccount, _
-                Exchange, Symbol, TradeType, OrderType, ProductType, _
-                Quantity, Price, TriggerPrice, Target, Stoploss, _
-                TrailingStoploss, DisclosedQuantity, Validity, _
-                Amo, StrategyId, Comments)
+    PlaceCoverOrder = PlaceOrderAdvanced(Variety, PseudoAccount, _
+            Exchange, Symbol, TradeType, OrderType, ProductType, _
+            Quantity, Price, TriggerPrice, Target, Stoploss, _
+            TrailingStoploss, DisclosedQuantity, Validity, _
+            Amo, StrategyId, Comments)
+
+End Function
+
+Public Function CancelOrder(PseudoAccount As String, _
+        OrderId As String) As Boolean
+
+    On Error GoTo Error_Handler
+        
+    Dim csv As String
+    Dim cols(0 To 2) As String
+
+    cols(0) = CANCEL_ORDER_CMD
+    cols(1) = PseudoAccount
+    cols(2) = OrderId
+
+    csv = Join(cols, ",")
+        
+    WriteCommand (csv)
+        
+    CancelOrder = True
+
+Error_Handler:
+    If Err.Number <> 0 Then
+        
+        Dim Message As String
+        Message = "The Error Happened on Line : " & Erl & vbNewLine & _
+                        "Error Message : " & Err.Description & vbNewLine & _
+                        "Error Number : " & Err.Number & vbNewLine & vbNewLine & _
+                        CONTACT_SUPPORT
+                
+        MsgBox Message, vbOKOnly, "Error"
+        Resume Next
+
+    End If
+        
+End Function
+
+Public Function ModifyOrder(PseudoAccount As String, _
+    OrderId As String, _
+    OrderType As String, _
+    Quantity As Integer, _
+    Price As Double, _
+    TriggerPrice As Double) As Boolean
+        
+    On Error GoTo Error_Handler
+        
+    Dim csv As String
+    Dim cols(0 To 6) As String
+
+    cols(0) = MODIFY_ORDER_CMD
+    cols(1) = PseudoAccount
+    cols(2) = OrderId
+    cols(3) = OrderType
+    cols(4) = Quantity
+    cols(5) = Price
+    cols(6) = TriggerPrice
+
+    csv = Join(cols, ",")
+        
+    WriteCommand (csv)
+        
+    ModifyOrder = True
+
+Error_Handler:
+    If Err.Number <> 0 Then
+        
+        Dim Message As String
+        Message = "The Error Happened on Line : " & Erl & vbNewLine & _
+                        "Error Message : " & Err.Description & vbNewLine & _
+                        "Error Number : " & Err.Number & vbNewLine & vbNewLine & _
+                        CONTACT_SUPPORT
+                
+        MsgBox Message, vbOKOnly, "Error"
+        Resume Next
+
+    End If
+        
+End Function
+
+Public Function ModifyOrderPrice(PseudoAccount As String, _
+    OrderId As String, _
+    Price As Double) As Boolean
+        
+    ModifyOrderPrice = ModifyOrder(PseudoAccount, OrderId, "", 0, Price, 0)
+
+End Function
+
+Public Function ModifyOrderQuantity(PseudoAccount As String, _
+    OrderId As String, _
+    Quantity As Integer) As Boolean
+
+    ModifyOrderQuantity = ModifyOrder(PseudoAccount, OrderId, "", Quantity, 0, 0)
 
 End Function
 
@@ -279,3 +377,4 @@ Public Function isAutoTraderClientMonitoring() As Boolean
         "AutoTrader client is not monitoring commands file.")
 
 End Function
+
