@@ -15,6 +15,18 @@ Const MODIFY_ORDER_CMD As String = "MODIFY_ORDER"
 Public Const EPOCH As Date = #1/1/1970#
 Public Const BLANK As String = ""
 
+Public Const VARIETY_REGULAR As String = "REGULAR"
+Public Const VARIETY_BO As String = "BO"
+Public Const VARIETY_CO As String = "CO"
+
+Public Const VALIDITY_DAY As String = "DAY"
+Public Const VALIDITY_IOC As String = "IOC"
+Public Const VALIDITY_DEFAULT As String = VALIDITY_DAY
+
+Public Const PRODUCT_INTRADAY As String = "INTRADAY"
+Public Const PRODUCT_DELIVERY As String = "DELIVERY"
+Public Const PRODUCT_NORMAL As String = "NORMAL"
+
 Private Sub Sleep(seconds As Integer)
 
     Dim newHour As Integer
@@ -108,25 +120,24 @@ Error_Handler:
     
 End Function
 
-Public Function PlaceOrder(Variety As String, _
+Public Function PlaceOrderAdvanced(Variety As String, _
     PseudoAccount As String, _
     Exchange As String, _
     Symbol As String, _
     TradeType As String, _
-    ProductType As String, _
     OrderType As String, _
+    ProductType As String, _
     Quantity As Integer, _
     Price As Double, _
     TriggerPrice As Double, _
-    Amo As Boolean, _
-    Validity As String, _
-    DisclosedQuantity As Integer, _
-    PublisherId As String, _
     Target As Double, _
     Stoploss As Double, _
     TrailingStoploss As Double, _
-    Comments As String, _
-    StrategyId As Integer) As String
+    DisclosedQuantity As Integer, _
+    Validity As String, _
+    Amo As Boolean, _
+    StrategyId As Integer, _
+    Comments As String) As String
 
     Dim o As New Order
     
@@ -159,17 +170,103 @@ Public Function PlaceOrder(Variety As String, _
     o.TriggerPrice = TriggerPrice
     o.Amo = Amo
     o.DisclosedQuantity = DisclosedQuantity
-    o.PublisherId = PublisherId
     o.Target = Target
     o.Stoploss = Stoploss
     o.TrailingStoploss = TrailingStoploss
     o.Comments = Comments
     o.StrategyId = StrategyId
 
-    PlaceOrder = PlaceOrderInternal(o)
+    PlaceOrderAdvanced = PlaceOrderInternal(o)
     
     ' Delay to avoid 'Too many requests' error
     Sleep (1)
+
+End Function
+        
+Public Function PlaceOrder( _
+    PseudoAccount As String, _
+    Exchange As String, _
+    Symbol As String, _
+    TradeType As String, _
+    OrderType As String, _
+    ProductType As String, _
+    Quantity As Integer, _
+    Price As Double, _
+    TriggerPrice As Double) As String
+        
+        Dim Variety As String: Variety = VARIETY_REGULAR
+        Dim Target As Double: Target = 0
+    Dim Stoploss As Double: Stoploss = 0
+    Dim TrailingStoploss As Double: TrailingStoploss = 0
+    Dim DisclosedQuantity As Integer: DisclosedQuantity = 0
+    Dim Validity As String: Validity = VALIDITY_DEFAULT
+    Dim Amo As Boolean: Amo = False
+    Dim StrategyId As Integer: StrategyId = -1
+    Dim Comments As String: Comments = ""
+        
+        PlaceOrder = PlaceOrderAdvanced(Variety, PseudoAccount, _
+                Exchange, Symbol, TradeType, OrderType, ProductType, _
+                Quantity, Price, TriggerPrice, Target, Stoploss, _
+                TrailingStoploss, DisclosedQuantity, Validity, _
+                Amo, StrategyId, Comments)
+
+End Function
+        
+Public Function PlaceBracketOrder( _
+    PseudoAccount As String, _
+    Exchange As String, _
+    Symbol As String, _
+    TradeType As String, _
+    OrderType As String, _
+    Quantity As Integer, _
+    Price As Double, _
+    TriggerPrice As Double, _
+    Target As Double, _
+    Stoploss As Double, _
+    TrailingStoploss As Double) As String
+
+        Dim Variety As String: Variety = VARIETY_BO
+    Dim DisclosedQuantity As Integer: DisclosedQuantity = 0
+    Dim Validity As String: Validity = VALIDITY_DEFAULT
+    Dim Amo As Boolean: Amo = False
+    Dim StrategyId As Integer: StrategyId = -1
+    Dim Comments As String: Comments = ""
+        Dim ProductType As String: ProductType = PRODUCT_INTRADAY
+
+        PlaceBracketOrder = PlaceOrderAdvanced(Variety, PseudoAccount, _
+                Exchange, Symbol, TradeType, OrderType, ProductType, _
+                Quantity, Price, TriggerPrice, Target, Stoploss, _
+                TrailingStoploss, DisclosedQuantity, Validity, _
+                Amo, StrategyId, Comments)
+
+End Function
+
+Public Function PlaceCoverOrder( _
+    PseudoAccount As String, _
+    Exchange As String, _
+    Symbol As String, _
+    TradeType As String, _
+    OrderType As String, _
+    Quantity As Integer, _
+    Price As Double, _
+    TriggerPrice As Double) As String
+
+        Dim Variety As String: Variety = VARIETY_CO
+    Dim DisclosedQuantity As Integer: DisclosedQuantity = 0
+    Dim Validity As String: Validity = VALIDITY_DEFAULT
+    Dim Amo As Boolean: Amo = False
+    Dim StrategyId As Integer: StrategyId = -1
+    Dim Comments As String: Comments = ""
+        Dim ProductType As String: ProductType = PRODUCT_INTRADAY
+        Dim Target As Double: Target = 0
+    Dim Stoploss As Double: Stoploss = 0
+    Dim TrailingStoploss As Double: TrailingStoploss = 0
+
+        PlaceCoverOrder = PlaceOrderAdvanced(Variety, PseudoAccount, _
+                Exchange, Symbol, TradeType, OrderType, ProductType, _
+                Quantity, Price, TriggerPrice, Target, Stoploss, _
+                TrailingStoploss, DisclosedQuantity, Validity, _
+                Amo, StrategyId, Comments)
 
 End Function
 
