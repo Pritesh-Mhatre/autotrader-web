@@ -183,9 +183,6 @@ Public Function PlaceOrderAdvanced(Variety As String, _
     o.StrategyId = StrategyId
 
     PlaceOrderAdvanced = PlaceOrderInternal(o)
-    
-    ' Delay to avoid 'Too many requests' error
-    Sleep (1)
 
 End Function
         
