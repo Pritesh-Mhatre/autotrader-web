@@ -13,6 +13,7 @@ Const OUTPUT_DIR As String = "output"
 
 Const CANCEL_ORDER_CMD As String = "CANCEL_ORDER"
 Const MODIFY_ORDER_CMD As String = "MODIFY_ORDER"
+Const CANCEL_CHILD_ORDER_CMD As String = "CANCEL_CHILD_ORDER";
 
 Public Const EPOCH As Date = #1/1/1970#
 Public Const BLANK As String = ""
@@ -282,6 +283,40 @@ Public Function CancelOrder(PseudoAccount As String, _
     Dim cols(0 To 2) As String
 
     cols(0) = CANCEL_ORDER_CMD
+    cols(1) = PseudoAccount
+    cols(2) = OrderId
+
+    csv = Join(cols, ",")
+        
+    WriteCommand (csv)
+        
+    CancelOrder = True
+
+Error_Handler:
+    If Err.Number <> 0 Then
+        
+        Dim Message As String
+        Message = "The Error Happened on Line : " & Erl & vbNewLine & _
+                        "Error Message : " & Err.Description & vbNewLine & _
+                        "Error Number : " & Err.Number & vbNewLine & vbNewLine & _
+                        CONTACT_SUPPORT
+                
+        MsgBox Message, vbOKOnly, "Error"
+        Resume Next
+
+    End If
+        
+End Function
+
+Public Function CancelOrderChildren(PseudoAccount As String, _
+        OrderId As String) As Boolean
+
+    On Error GoTo Error_Handler
+        
+    Dim csv As String
+    Dim cols(0 To 2) As String
+
+    cols(0) = CANCEL_CHILD_ORDER_CMD
     cols(1) = PseudoAccount
     cols(2) = OrderId
 
