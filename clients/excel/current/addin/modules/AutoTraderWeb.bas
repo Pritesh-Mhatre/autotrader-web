@@ -478,3 +478,45 @@ Public Function ReadOrderColumn(pseudoAccount As String, _
 	filePath = GetPortfolioOrdersFile(pseudoAccount)
     ReadOrderColumn = FileReadCsvColumnByRowId( filePath, orderId, 3, columnIndex )
 End Function
+
+' Retrieve order's trading account.
+Public Function GetOrderTradingAccount(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderTradingAccount = ReadOrderColumn(pseudoAccount, orderId, 2)
+End Function
+
+' Retrieve order's trading platform id.
+Public Function GetOrderId(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderId = ReadOrderColumn(pseudoAccount, orderId, 4)
+End Function
+
+' Retrieve order's exchange id.
+Public Function GetOrderExchangeId(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderExchangeId = ReadOrderColumn(pseudoAccount, orderId, 5)
+End Function
+
+' Retrieve order's variety (REGULAR, BO, CO).
+Public Function GetOrderVariety(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderVariety = ReadOrderColumn(pseudoAccount, orderId, 6)
+End Function
+
+' Retrieve order's (platform independent) exchange.
+Public Function GetOrderIndependentExchange(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderIndependentExchange = ReadOrderColumn(pseudoAccount, orderId, 7)
+End Function
+
+' Retrieve order's (platform independent) symbol.
+Public Function GetOrderIndependentSymbol(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderIndependentSymbol = ReadOrderColumn(pseudoAccount, orderId, 8)
+End Function
+
+' Retrieve order's trade type (BUY, SELL).
+Public Function GetOrderTradeType(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderTradeType = ReadOrderColumn(pseudoAccount, orderId, 9)
+End Function
