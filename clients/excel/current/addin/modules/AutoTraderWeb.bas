@@ -520,3 +520,150 @@ Public Function GetOrderTradeType(pseudoAccount As String, _
 	orderId As String) As String
 	GetOrderTradeType = ReadOrderColumn(pseudoAccount, orderId, 9)
 End Function
+
+' Retrieve order's order type (LIMIT, MARKET, STOP_LOSS, SL_MARKET).
+Public Function GetOrderOrderType(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderOrderType = ReadOrderColumn(pseudoAccount, orderId, 10)
+End Function
+
+' Retrieve order's product type (INTRADAY, DELIVERY, NORMAL).
+Public Function GetOrderProductType(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderProductType = ReadOrderColumn(pseudoAccount, orderId, 11)
+End Function
+
+' Retrieve order's quantity.
+Public Function GetOrderQuantity(pseudoAccount As String, _
+	orderId As String) As Long
+	GetOrderQuantity = CLng(ReadOrderColumn(pseudoAccount, orderId, 12))
+End Function
+
+' Retrieve order's price.
+Public Function GetOrderPrice(pseudoAccount As String, _
+	orderId As String) As Double
+	GetOrderPrice = CDbl(ReadOrderColumn(pseudoAccount, orderId, 13))
+End Function
+
+' Retrieve order's trigger price.
+Public Function GetOrderTriggerPrice(pseudoAccount As String, _
+	orderId As String) As Double
+	GetOrderTriggerPrice = CDbl(ReadOrderColumn(pseudoAccount, orderId, 14))
+End Function
+
+' Retrieve order's filled quantity.
+Public Function GetOrderFilledQuantity(pseudoAccount As String, _
+	orderId As String) As Long
+	GetOrderFilledQuantity = CLng(ReadOrderColumn(pseudoAccount, orderId, 15))
+End Function
+
+' Retrieve order's pending quantity.
+Public Function GetOrderPendingQuantity(pseudoAccount As String, _
+	orderId As String) As Long
+	GetOrderPendingQuantity = CLng(ReadOrderColumn(pseudoAccount, orderId, 16))
+End Function
+
+' Retrieve order's (platform independent) status.
+' (OPEN, COMPLETE, CANCELLED, REJECTED, TRIGGER_PENDING, UNKNOWN)
+Public Function GetOrderStatus(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderStatus = ReadOrderColumn(pseudoAccount, orderId, 17)
+End Function
+
+' Retrieve order's status message or rejection reason.
+Public Function GetOrderStatusMessage(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderStatusMessage = ReadOrderColumn(pseudoAccount, orderId, 18)
+End Function
+
+' Retrieve order's validity (DAY, IOC).
+Public Function GetOrderValidity(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderValidity = ReadOrderColumn(pseudoAccount, orderId, 19)
+End Function
+
+' Retrieve order's average price at which it got traded.
+Public Function GetOrderAveragePrice(pseudoAccount As String, _
+	orderId As String) As Double
+	GetOrderAveragePrice = CDbl(ReadOrderColumn(pseudoAccount, orderId, 20))
+End Function
+
+' Retrieve order's parent order id. The id of parent bracket or cover order.
+Public Function GetOrderParentOrderId(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderParentOrderId = ReadOrderColumn(pseudoAccount, orderId, 21)
+End Function
+
+' Retrieve order's disclosed quantity.
+Public Function GetOrderDisclosedQuantity(pseudoAccount As String, _
+	orderId As String) As Long
+	GetOrderDisclosedQuantity = CLng(ReadOrderColumn(pseudoAccount, orderId, 22))
+End Function
+
+' Retrieve order's exchange time as a string (YYYY-MM-DD HH:MM:SS.MILLIS).
+Public Function GetOrderExchangeTime(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderExchangeTime = ReadOrderColumn(pseudoAccount, orderId, 23)
+End Function
+
+' Retrieve order's platform time as a string (YYYY-MM-DD HH:MM:SS.MILLIS).
+Public Function GetOrderPlatformTime(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderPlatformTime = ReadOrderColumn(pseudoAccount, orderId, 24)
+End Function
+
+' Retrieve order's AMO (after market order) flag. (true/false)
+Public Function GetOrderAmo(pseudoAccount As String, _
+	orderId As String) As Boolean
+	Dim flag As String
+	flag = ReadOrderColumn(pseudoAccount, orderId, 25)
+	GetOrderAmo = (LCase(flag) = "true")
+End Function
+
+' Retrieve order's comments.
+Public Function GetOrderComments(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderComments = ReadOrderColumn(pseudoAccount, orderId, 26)
+End Function
+
+' Retrieve order's raw (platform specific) status.
+Public Function GetOrderRawStatus(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderRawStatus = ReadOrderColumn(pseudoAccount, orderId, 27)
+End Function
+
+' Retrieve order's (platform specific) exchange.
+Public Function GetOrderExchange(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderExchange = ReadOrderColumn(pseudoAccount, orderId, 28)
+End Function
+
+' Retrieve order's (platform specific) symbol.
+Public Function GetOrderSymbol(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderSymbol = ReadOrderColumn(pseudoAccount, orderId, 29)
+End Function
+
+' Retrieve order's date (DD-MM-YYYY).
+Public Function GetOrderDay(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderDay = ReadOrderColumn(pseudoAccount, orderId, 30)
+End Function
+
+' Retrieve order's trading platform.
+Public Function GetOrderPlatform(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderPlatform = ReadOrderColumn(pseudoAccount, orderId, 31)
+End Function
+
+' Retrieve order's client id (as received from trading platform).
+Public Function GetOrderClientId(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderClientId = ReadOrderColumn(pseudoAccount, orderId, 32)
+End Function
+
+' Retrieve order's stock broker.
+Public Function GetOrderStockBroker(pseudoAccount As String, _
+	orderId As String) As String
+	GetOrderStockBroker = ReadOrderColumn(pseudoAccount, orderId, 33)
+End Function
