@@ -667,3 +667,40 @@ Public Function GetOrderStockBroker(pseudoAccount As String, _
 	orderId As String) As String
 	GetOrderStockBroker = ReadOrderColumn(pseudoAccount, orderId, 33)
 End Function
+
+' Checks whether order is open.
+Public Function IsOrderOpen(pseudoAccount As String, _
+	orderId As String) As Boolean
+	Dim oStatus As String
+	oStatus = getOrderStatus(pseudoAccount, orderId)
+	IsOrderOpen = (UCase(oStatus) = "OPEN" OR UCase(oStatus) = "TRIGGER_PENDING")
+End Function
+
+' Checks whether order is complete.
+Public Function IsOrderComplete(pseudoAccount As String, _
+	orderId As String) As Boolean
+	Dim oStatus As String
+	oStatus = getOrderStatus(pseudoAccount, orderId)	
+	IsOrderComplete = UCase(oStatus) = "COMPLETE"
+End Function
+
+' Checks whether order is rejected.
+Public Function IsOrderRejected(pseudoAccount As String, _
+	orderId As String) As Boolean
+	Dim oStatus As String
+	oStatus = getOrderStatus(pseudoAccount, orderId)
+	IsOrderRejected = UCase(oStatus) = "REJECTED"
+End Function
+
+' Checks whether order is cancelled.
+Public Function IsOrderCancelled(pseudoAccount As String, _
+	orderId As String) As Boolean
+	Dim oStatus As String
+	oStatus = getOrderStatus(pseudoAccount, orderId)
+	IsOrderCancelled = UCase(oStatus) = "CANCELLED"
+End Function
+
+' *****************************************************************************/
+' ************************ POSITION DETAIL FUNCTIONS - END ***********************/
+' *****************************************************************************/
+
