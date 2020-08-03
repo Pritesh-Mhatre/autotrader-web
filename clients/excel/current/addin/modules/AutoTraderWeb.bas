@@ -381,7 +381,7 @@ Public Function CancelOrderChildren(PseudoAccount As String, _
         
     WriteCommand (csv)
         
-    CancelOrder = True
+    CancelOrderChildren = True
 
 Error_Handler:
     If Err.Number <> 0 Then
