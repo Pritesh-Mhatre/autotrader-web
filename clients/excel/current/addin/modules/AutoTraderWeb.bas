@@ -467,3 +467,14 @@ Public Function isAutoTraderClientMonitoring() As Boolean
 
 End Function
 
+' *****************************************************************************/
+' ************************ ORDER DETAIL FUNCTIONS - END ***********************/
+' *****************************************************************************/
+
+' Reads orders file and returns a column value for the given order id.
+Public Function ReadOrderColumn(pseudoAccount As String, _
+	orderId As String, columnIndex As Integer) As String
+    Dim filePath As String
+	filePath = GetPortfolioOrdersFile(pseudoAccount)
+    ReadOrderColumn = FileReadCsvColumnByRowId( filePath, orderId, 3, columnIndex )
+End Function
