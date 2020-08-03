@@ -13,7 +13,7 @@ Const OUTPUT_DIR As String = "output"
 
 Const CANCEL_ORDER_CMD As String = "CANCEL_ORDER"
 Const MODIFY_ORDER_CMD As String = "MODIFY_ORDER"
-Const CANCEL_CHILD_ORDER_CMD As String = "CANCEL_CHILD_ORDER";
+Const CANCEL_CHILD_ORDER_CMD As String = "CANCEL_CHILD_ORDER"
 
 Public Const EPOCH As Date = #1/1/1970#
 Public Const BLANK As String = ""
@@ -46,6 +46,76 @@ Private Sub Sleep(seconds As Integer)
 
 End Sub
 
+Private Function GetIPCDirectory() As String
+    
+    GetIPCDirectory = Environ("USERPROFILE") & Application.PathSeparator & "autotrader"
+
+End Function
+
+Private Function GetOutputDirectory() As String
+    
+    GetOutputDirectory = GetIPCDirectory & Application.PathSeparator _
+        & OUTPUT_DIR
+
+End Function
+
+Private Function GetCommandsFilePath() As String
+    
+    GetCommandsFilePath = GetIPCDirectory & Application.PathSeparator _
+        & INPUT_DIR & Application.PathSeparator & COMMANDS_FILE
+
+End Function
+
+Public Function GetPortfolioOrdersFile(pseudoAccount As String) As String
+
+	GetPortfolioOrdersFile = GetOutputDirectory & Application.PathSeparator _
+		&  pseudoAccount & "-orders.csv"
+
+End Function
+
+Public Function GetPortfolioPositionsFile(pseudoAccount As String) As String
+
+	GetPortfolioPositionsFile = GetOutputDirectory & Application.PathSeparator _
+		&  pseudoAccount & "-positions.csv"
+
+End Function
+
+Public Function GetPortfolioMarginsFile(pseudoAccount As String) As String
+
+	GetPortfolioMarginsFile = GetOutputDirectory & Application.PathSeparator _
+		&  pseudoAccount & "-margins.csv"
+
+End Function
+
+Public Function FileReadCsvColumnByRowId(filePath As String, _
+	rowId As String, rowIdColumnIndex As Integer, columnIndex As Integer) As String
+    
+    On Error GoTo Done
+    
+    Dim temp As String
+    Dim cols() As String
+
+    FileReadCsvColumnByRowId = ""
+    
+    Open filePath For Input As #1
+    
+    Do Until EOF(1)
+        Line Input #1, temp
+        cols = Split(temp, ",")
+        
+        If cols(rowIdColumnIndex - 1) = rowId Then
+            FileReadCsvColumnByRowId = cols(columnIndex - 1)
+            Exit Do
+        End If
+        
+    Loop
+    
+    Close #1
+
+Done:
+    Exit Function
+    
+End Function
 
 Private Function NextOrderNumber() As String
 
@@ -68,19 +138,6 @@ Private Function ValidateFile(FilePath As String, Message As String) As Boolean
             ValidateFile = True
         End If
     End With
-
-End Function
-
-Private Function GetIPCDirectory() As String
-    
-    GetIPCDirectory = Environ("USERPROFILE") & Application.PathSeparator & "autotrader"
-
-End Function
-
-Private Function GetCommandsFilePath() As String
-    
-    GetCommandsFilePath = GetIPCDirectory & Application.PathSeparator _
-        & INPUT_DIR & Application.PathSeparator & COMMANDS_FILE
 
 End Function
 
