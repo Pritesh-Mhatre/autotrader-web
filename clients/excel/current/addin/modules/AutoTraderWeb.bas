@@ -30,6 +30,10 @@ Public Const PRODUCT_INTRADAY As String = "INTRADAY"
 Public Const PRODUCT_DELIVERY As String = "DELIVERY"
 Public Const PRODUCT_NORMAL As String = "NORMAL"
 
+Public Const MARGIN_EQUITY As String = "EQUITY"
+Public Const MARGIN_COMMODITY As String = "COMMODITY"
+Public Const MARGIN_ALL As String = "ALL"
+
 Private Sub Sleep(seconds As Integer)
 
     Dim newHour As Integer
@@ -468,7 +472,7 @@ Public Function isAutoTraderClientMonitoring() As Boolean
 End Function
 
 ' *****************************************************************************/
-' ************************ ORDER DETAIL FUNCTIONS - END ***********************/
+' ************************ ORDER DETAIL FUNCTIONS - START ***********************/
 ' *****************************************************************************/
 
 ' Reads orders file and returns a column value for the given order id.
@@ -701,6 +705,84 @@ Public Function IsOrderCancelled(pseudoAccount As String, _
 End Function
 
 ' *****************************************************************************/
-' ************************ POSITION DETAIL FUNCTIONS - END ***********************/
+' ************************ ORDER DETAIL FUNCTIONS - END ***********************/
 ' *****************************************************************************/
 
+' *****************************************************************************/
+' ************************ MARGIN DETAIL FUNCTIONS - START ***********************/
+' *****************************************************************************/
+
+' Reads margins file and returns a column value for the given margin category.
+Public Function ReadMarginColumn(pseudoAccount As String, _
+	category As String, columnIndex As Integer) As String
+    Dim filePath As String
+	filePath = GetPortfolioMarginsFile(pseudoAccount)
+	ReadMarginColumn = FileReadCsvColumnByRowId( filePath, category, 3, columnIndex )
+End Function
+
+' Retrieve margin funds.
+Public Function GetMarginFunds(pseudoAccount As String, _
+	category As String) As Double
+	GetMarginFunds = CDbl(ReadMarginColumn(pseudoAccount, category, 4))
+End Function
+
+' Retrieve margin utilized.
+Public Function GetMarginUtilized(pseudoAccount As String, _
+	category As String) As Double
+	GetMarginUtilized = CDbl(ReadMarginColumn(pseudoAccount, category, 5))
+End Function
+
+' Retrieve margin available.
+Public Function GetMarginAvailable(pseudoAccount As String, _
+	category As String) As Double
+	GetMarginAvailable = CDbl(ReadMarginColumn(pseudoAccount, category, 6))
+End Function
+
+' Retrieve margin funds for equity category.
+Public Function GetMarginFundsEquity(pseudoAccount As String) As Double
+	GetMarginFundsEquity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_EQUITY, 4))
+End Function
+
+' Retrieve margin utilized for equity category.
+Public Function GetMarginUtilizedEquity(pseudoAccount As String) As Double
+	GetMarginUtilizedEquity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_EQUITY, 5))
+End Function
+
+' Retrieve margin available for equity category.
+Public Function GetMarginAvailableEquity(pseudoAccount As String) As Double
+	GetMarginAvailableEquity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_EQUITY, 6))
+End Function
+
+' Retrieve margin funds for commodity category.
+Public Function GetMarginFundsCommodity(pseudoAccount As String) As Double
+	GetMarginFundsCommodity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_COMMODITY, 4))
+End Function
+
+' Retrieve margin utilized for commodity category.
+Public Function GetMarginUtilizedCommodity(pseudoAccount As String) As Double
+	GetMarginUtilizedCommodity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_COMMODITY, 5))
+End Function
+
+' Retrieve margin available for commodity category.
+Public Function GetMarginAvailableCommodity(pseudoAccount As String) As Double
+	GetMarginAvailableCommodity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_COMMODITY, 6))
+End Function
+
+' Retrieve margin funds for entire account.
+Public Function GetMarginFundsAll(pseudoAccount As String) As Double
+	GetMarginFundsAll = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_ALL, 4))
+End Function
+
+' Retrieve margin utilized for entire account.
+Public Function GetMarginUtilizedAll(pseudoAccount As String) As Double
+	GetMarginUtilizedAll = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_ALL, 5))
+End Function
+
+' Retrieve margin available for entire account.
+Public Function GetMarginAvailableAll(pseudoAccount As String) As Double
+	GetMarginAvailableAll = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_ALL, 6))
+End Function
+
+' *****************************************************************************/
+' ************************ MARGIN DETAIL FUNCTIONS - END ***********************/
+' *****************************************************************************/
