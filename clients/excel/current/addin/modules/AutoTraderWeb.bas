@@ -471,9 +471,9 @@ Public Function isAutoTraderClientMonitoring() As Boolean
 
 End Function
 
-' *****************************************************************************/
-' ************************ ORDER DETAIL FUNCTIONS - START ***********************/
-' *****************************************************************************/
+' *****************************************************************************
+' ************************ ORDER DETAIL FUNCTIONS - START ***********************
+' *****************************************************************************
 
 ' Reads orders file and returns a column value for the given order id.
 Public Function ReadOrderColumn(pseudoAccount As String, _
@@ -704,13 +704,256 @@ Public Function IsOrderCancelled(pseudoAccount As String, _
 	IsOrderCancelled = UCase(oStatus) = "CANCELLED"
 End Function
 
-' *****************************************************************************/
-' ************************ ORDER DETAIL FUNCTIONS - END ***********************/
-' *****************************************************************************/
+' *****************************************************************************
+' ************************ ORDER DETAIL FUNCTIONS - END ***********************
+' *****************************************************************************
 
-' *****************************************************************************/
-' ************************ MARGIN DETAIL FUNCTIONS - START ***********************/
-' *****************************************************************************/
+
+' *****************************************************************************
+' ************************ POSITION DETAIL FUNCTIONS - START ***********************
+' *****************************************************************************
+
+' Reads positions file and returns a column value for the given position id.
+' Position id is a combination of category, type, independentExchange & independentSymbol.
+Public Function ReadPositionColumnInternal(pseudoAccount As String, _ 
+	category As String, categoryColumnIndex As Integer,	_
+	posType As String, typeColumnIndex As Integer, _
+	independentExchange As String, independentExchangeColumnIndex As Integer, _
+	independentSymbol As String, independentSymbolColumnIndex As Integer, _
+	columnIndex As Integer) As String
+	
+	filePath = getPortfolioPositionsFile(pseudoAccount)
+	
+	fh = fopen( filePath, FILE_DEFAULT_READ_MODE )
+	result = ""
+	
+	if( fh )
+	{
+		for( i = 0 ! feof( fh ) AND i < FILE_DEFAULT_MAX_LINES_SAFETY_CHECK i++ ) 
+		{
+			// read a line of text
+			line = fgets( fh ) 
+
+			if( line == "" )
+			{
+				// Continue if we encounter a blank line
+				continue
+			}
+			
+			if(	category == StrExtract( line, categoryColumnIndex - 1 ) AND
+				posType == StrExtract( line, typeColumnIndex - 1 ) AND
+				independentExchange == StrExtract( line, independentExchangeColumnIndex - 1 ) AND
+				independentSymbol == StrExtract( line, independentSymbolColumnIndex - 1 ) ) {
+				
+				result = StrExtract( line, columnIndex - 1 )
+				break
+			}
+		}
+		
+		fclose( fh )
+	}
+	else
+	{
+	   _TRACE("ERROR: file can not be found " + filePath)
+	}
+	
+	return result
+End Function
+
+' Reads positions file and returns a column value for the given position id.
+' Position id is a combination of category, type, independentExchange & independentSymbol.
+Public Function ReadPositionColumn(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String, columnIndex As Integer) As String
+	
+	ReadPositionColumn = ReadPositionColumnInternal(pseudoAccount, _
+		category, 4, posType, 3,	independentExchange, 5, independentSymbol, 6, columnIndex)
+End Function
+
+' Retrieve positions's trading account.
+Public Function GetPositionTradingAccount(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As String
+	GetPositionTradingAccount = ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 2)
+End Function
+
+' Retrieve positions's MTM.
+Public Function GetPositionMtm(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As Double
+	GetPositionMtm = CDbl(ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 7))
+End Function
+
+' Retrieve positions's PNL.
+Public Function GetPositionPnl(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As Double
+	GetPositionPnl = CDbl(ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 8))
+End Function
+
+' Retrieve positions's buy quantity.
+Public Function GetPositionBuyQuantity(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As Long
+	GetPositionBuyQuantity = CLng(ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 9))
+End Function
+
+' Retrieve positions's sell quantity.
+Public Function GetPositionSellQuantity(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As Long
+	GetPositionSellQuantity = CLng(ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 10))
+End Function
+
+' Retrieve positions's net quantity.
+Public Function GetPositionNetQuantity(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As Long
+	GetPositionNetQuantity = CLng(ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 11))
+End Function
+
+' Retrieve positions's buy value.
+Public Function GetPositionBuyValue(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As Double
+	GetPositionBuyValue = CDbl(ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 12))
+End Function
+
+' Retrieve positions's sell value.
+Public Function GetPositionSellValue(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As Double
+	GetPositionSellValue = CDbl(ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 13))
+End Function
+
+' Retrieve positions's net value.
+Public Function GetPositionNetValue(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As Double
+	GetPositionNetValue = CDbl(ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 14))
+End Function
+
+' Retrieve positions's buy average price.
+Public Function GetPositionBuyAvgPrice(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As Double
+	GetPositionBuyAvgPrice = CDbl(ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 15))
+End Function
+
+' Retrieve positions's sell average price.
+Public Function GetPositionSellAvgPrice(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As Double
+	GetPositionSellAvgPrice = CDbl(ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 16))
+End Function
+
+' Retrieve positions's realised pnl.
+Public Function GetPositionRealisedPnl(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As Double
+	GetPositionRealisedPnl = CDbl(ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 17))
+End Function
+
+' Retrieve positions's unrealised pnl.
+Public Function GetPositionUnrealisedPnl(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As Double
+	GetPositionUnrealisedPnl = CDbl(ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 18))
+End Function
+
+' Retrieve positions's overnight quantity.
+Public Function GetPositionOvernightQuantity(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As Long
+	GetPositionOvernightQuantity = CLng(ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 19))
+End Function
+
+' Retrieve positions's multiplier.
+Public Function GetPositionMultiplier(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As Long
+	GetPositionMultiplier = CLng(ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 20))
+End Function
+
+' Retrieve positions's LTP.
+Public Function GetPositionLtp(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As Double
+	GetPositionLtp = CDbl(ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 21))
+End Function
+
+' Retrieve positions's (platform specific) exchange.
+Public Function GetPositionExchange(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As String
+	GetPositionExchange = ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 22)
+End Function
+
+' Retrieve positions's (platform specific) symbol.
+Public Function GetPositionSymbol(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As String
+	GetPositionSymbol = ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 23)
+End Function
+
+' Retrieve positions's date (DD-MM-YYYY).
+Public Function GetPositionDay(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As String
+	GetPositionDay = ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 24)
+End Function
+
+' Retrieve positions's trading platform.
+Public Function GetPositionPlatform(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As String
+	GetPositionPlatform = ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 25)
+End Function
+
+' Retrieve positions's account id as received from trading platform.
+Public Function GetPositionAccountId(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As String
+	GetPositionAccount = ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 26)
+End Function
+
+' Retrieve positions's stock broker.
+Public Function GetPositionStockBroker(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As String
+	GetPositionStockBroker = ReadPositionColumn(pseudoAccount, _
+		category, posType, independentExchange, independentSymbol, 28)
+End Function
+
+' *****************************************************************************
+' ************************ POSITION DETAIL FUNCTIONS - END ***********************
+' *****************************************************************************
+
+
+' *****************************************************************************
+' ************************ MARGIN DETAIL FUNCTIONS - START ***********************
+' *****************************************************************************
 
 ' Reads margins file and returns a column value for the given margin category.
 Public Function ReadMarginColumn(pseudoAccount As String, _
@@ -783,6 +1026,6 @@ Public Function GetMarginAvailableAll(pseudoAccount As String) As Double
 	GetMarginAvailableAll = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_ALL, 6))
 End Function
 
-' *****************************************************************************/
-' ************************ MARGIN DETAIL FUNCTIONS - END ***********************/
-' *****************************************************************************/
+' *****************************************************************************
+' ************************ MARGIN DETAIL FUNCTIONS - END ***********************
+' *****************************************************************************
