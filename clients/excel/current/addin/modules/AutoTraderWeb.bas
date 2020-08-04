@@ -117,7 +117,18 @@ Public Function FileReadCsvColumnByRowId(filePath As String, _
     Close #1
 
 Done:
-    Exit Function
+    If Err.Number <> 0 Then
+        
+        Dim Message As String
+        Message = "The Error Happened on Line : " & Erl & vbNewLine & _
+                        "Error Message : " & Err.Description & vbNewLine & _
+                        "Error Number : " & Err.Number & vbNewLine & vbNewLine & _
+                        CONTACT_SUPPORT
+                
+        MsgBox Message, vbOKOnly, "Error"
+        Resume Next
+
+    End If
     
 End Function
 
@@ -722,42 +733,48 @@ Public Function ReadPositionColumnInternal(pseudoAccount As String, _
 	independentSymbol As String, independentSymbolColumnIndex As Integer, _
 	columnIndex As Integer) As String
 	
-	filePath = getPortfolioPositionsFile(pseudoAccount)
+    On Error GoTo Done
+    
+    Dim temp As String
+    Dim cols() As String
+	Dim filePath As String
 	
-	fh = fopen( filePath, FILE_DEFAULT_READ_MODE )
-	result = ""
-	
-	if( fh )
-	{
-		for( i = 0 ! feof( fh ) AND i < FILE_DEFAULT_MAX_LINES_SAFETY_CHECK i++ ) 
-		{
-			// read a line of text
-			line = fgets( fh ) 
-
-			if( line == "" )
-			{
-				// Continue if we encounter a blank line
-				continue
-			}
+	filePath = GetPortfolioPositionsFile(pseudoAccount)
+    ReadPositionColumnInternal = ""
+    
+    Open filePath For Input As #1
+    
+    Do Until EOF(1)
+        Line Input #1, temp
+        cols = Split(temp, ",")
+        
+        If (cols(categoryColumnIndex - 1) = category) AND _
+			(cols(typeColumnIndex - 1) = posType) AND _
+			(cols(independentExchangeColumnIndex - 1) = independentExchange) AND _
+			(cols(independentSymbolColumnIndex - 1) = independentSymbol) _			
+		Then
+            ReadPositionColumnInternal = cols(columnIndex - 1)
+            Exit Do
+        End If
 			
-			if(	category == StrExtract( line, categoryColumnIndex - 1 ) AND
-				posType == StrExtract( line, typeColumnIndex - 1 ) AND
-				independentExchange == StrExtract( line, independentExchangeColumnIndex - 1 ) AND
-				independentSymbol == StrExtract( line, independentSymbolColumnIndex - 1 ) ) {
-				
-				result = StrExtract( line, columnIndex - 1 )
-				break
-			}
-		}
-		
-		fclose( fh )
-	}
-	else
-	{
-	   _TRACE("ERROR: file can not be found " + filePath)
-	}
-	
-	return result
+    Loop
+    
+    Close #1
+
+Done:
+    If Err.Number <> 0 Then
+        
+        Dim Message As String
+        Message = "The Error Happened on Line : " & Erl & vbNewLine & _
+                        "Error Message : " & Err.Description & vbNewLine & _
+                        "Error Number : " & Err.Number & vbNewLine & vbNewLine & _
+                        CONTACT_SUPPORT
+                
+        MsgBox Message, vbOKOnly, "Error"
+        Resume Next
+
+    End If
+    	
 End Function
 
 ' Reads positions file and returns a column value for the given position id.
@@ -934,7 +951,7 @@ End Function
 Public Function GetPositionAccountId(pseudoAccount As String, _ 
 	category As String, posType As String, independentExchange As String, _
 	independentSymbol As String) As String
-	GetPositionAccount = ReadPositionColumn(pseudoAccount, _
+	GetPositionAccountId = ReadPositionColumn(pseudoAccount, _
 		category, posType, independentExchange, independentSymbol, 26)
 End Function
 
