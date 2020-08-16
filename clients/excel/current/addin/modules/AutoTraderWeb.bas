@@ -14,6 +14,8 @@ Const OUTPUT_DIR As String = "output"
 Const CANCEL_ORDER_CMD As String = "CANCEL_ORDER"
 Const MODIFY_ORDER_CMD As String = "MODIFY_ORDER"
 Const CANCEL_CHILD_ORDER_CMD As String = "CANCEL_CHILD_ORDER"
+Const SQUARE_OFF_POSITION_CMD As String = "SQUARE_OFF_POSITION"
+Const SQUARE_OFF_PORTFOLIO_CMD As String = "SQUARE_OFF_PORTFOLIO"
 
 Public Const EPOCH As Date = #1/1/1970#
 Public Const BLANK As String = ""
@@ -470,6 +472,88 @@ Public Function ModifyOrderQuantity(PseudoAccount As String, _
 
     ModifyOrderQuantity = ModifyOrder(PseudoAccount, OrderId, "", Quantity, 0, 0)
 
+End Function
+
+' Submits a square-off request for the given position.
+'
+' pseudoAccount - account to which the position belongs
+' category - position category (DAY, NET). Pass DAY if you are not sure.
+' type - position type (MIS, NRML, CNC, BO, CO) 
+' independentExchange - broker independent exchange
+' independentSymbol - broker independent symbol
+Public Function SquareOffPosition(pseudoAccount As String, _ 
+	category As String, posType As String, independentExchange As String, _
+	independentSymbol As String) As Boolean
+        
+    On Error GoTo Error_Handler
+        
+    Dim csv As String
+    Dim cols(0 To 5) As String
+
+    cols(0) = SQUARE_OFF_POSITION_CMD
+    cols(1) = pseudoAccount
+    cols(2) = category
+    cols(3) = posType
+    cols(4) = independentExchange
+    cols(5) = independentSymbol
+
+    csv = Join(cols, ",")
+        
+    WriteCommand (csv)
+        
+    SquareOffPosition = True
+
+Error_Handler:
+    If Err.Number <> 0 Then
+        
+        Dim Message As String
+        Message = "The Error Happened on Line : " & Erl & vbNewLine & _
+                        "Error Message : " & Err.Description & vbNewLine & _
+                        "Error Number : " & Err.Number & vbNewLine & vbNewLine & _
+                        CONTACT_SUPPORT
+                
+        MsgBox Message, vbOKOnly, "Error"
+        Resume Next
+
+    End If
+End Function
+
+' Submits a square-off request for the given account.
+' Server will square-off all open positions in the given account.
+'
+' pseudoAccount - account to which the position belongs
+' category - position category (DAY, NET). Pass DAY if you are not sure.
+Public Function SquareOffPortfolio(pseudoAccount As String, _ 
+	category As String) As Boolean
+        
+    On Error GoTo Error_Handler
+        
+    Dim csv As String
+    Dim cols(0 To 2) As String
+
+    cols(0) = SQUARE_OFF_PORTFOLIO_CMD
+    cols(1) = pseudoAccount
+    cols(2) = category
+	
+    csv = Join(cols, ",")
+        
+    WriteCommand (csv)
+        
+    SquareOffPortfolio = True
+
+Error_Handler:
+    If Err.Number <> 0 Then
+        
+        Dim Message As String
+        Message = "The Error Happened on Line : " & Erl & vbNewLine & _
+                        "Error Message : " & Err.Description & vbNewLine & _
+                        "Error Number : " & Err.Number & vbNewLine & vbNewLine & _
+                        CONTACT_SUPPORT
+                
+        MsgBox Message, vbOKOnly, "Error"
+        Resume Next
+
+    End If
 End Function
 
 Public Function isAutoTraderClientMonitoring() As Boolean
