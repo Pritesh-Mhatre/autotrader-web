@@ -1,7 +1,7 @@
 # AutoTrader Web is a multi-account automated trading software suite for Zerodha, Upstox, AliceBlue, Finvasia, MasterTrust, Angel Broking
 
 ## Introduction
-[AutoTrader Web](https://stocksdeveloper.in/autotrader-web/) is our next generation automated trading & PMS software suite. **Most preferred tool by portfolio & fund managers, algorithmic traders as well as sub-brokers.**
+**[AutoTrader Web](https://stocksdeveloper.in/autotrader-web/)** is our next generation automated trading & PMS software suite. **Most preferred tool by portfolio & fund managers, algorithmic traders as well as sub-brokers.**
 
 It allows you to **trade & manage multiple trading accounts** across **different stock brokers from a single system**.
 
@@ -31,3 +31,7 @@ Massively reduce trading costs based on following features:
   - MVT (Mastertrust) Web
   - Angel Broking Web
 - A **[complete list of features](https://stocksdeveloper.in/autotrader-web-features/)**
+
+## Help
+- **[User Guide](https://stocksdeveloper.in/documentation/index/)**
+- **[User Guide - API Docs](https://stocksdeveloper.in/documentation/api/)**
