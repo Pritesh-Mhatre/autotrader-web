@@ -1,5 +1,6 @@
 Attribute VB_Name = "AutoTraderClient"
 Option Explicit
+Dim TIMER_RUNNING As Boolean
 
 Sub PlaceOrders()
     
@@ -79,6 +80,10 @@ Sub PlaceOrdersManual()
 
 End Sub
 
+Sub StopTimer()
+        TIMER_RUNNING = False
+        Worksheets("timer").Buttons("timer-button").Caption = "Start Timer"
+End Sub
 
 Sub PlaceOrdersOnTime()
 
@@ -87,11 +92,16 @@ Sub PlaceOrdersOnTime()
     Deadline = Worksheets("timer").Range("B1")
     RemainingTime = Deadline - (Now - Date)
     
+    If TIMER_RUNNING = False Then
+        Exit Sub
+    End If
+    
     If RemainingTime > (-1 / 86400) Then
         Worksheets("timer").Range("B2").Value = Format(RemainingTime, "h:mm:ss")
         Application.OnTime Now + 1 / 86400, "PlaceOrdersOnTime"
     Else
         PlaceOrders
+        StopTimer
     End If
     
 End Sub
@@ -103,11 +113,17 @@ Sub StartTimer()
     Deadline = Worksheets("timer").Range("B1")
     RemainingTime = Deadline - (Now - Date)
     
-    If RemainingTime <= (-1 / 86400) Then
+    If TIMER_RUNNING Then
+        StopTimer
+        MsgBox "Timer has been stopped."
+        Exit Sub
+    ElseIf RemainingTime <= (-1 / 86400) Then
         MsgBox "Time has already expired, please correct time."
         Exit Sub
     End If
     
+    TIMER_RUNNING = True
+    Worksheets("timer").Buttons("timer-button").Caption = "Stop Timer"
     PlaceOrdersOnTime
     
 End Sub
