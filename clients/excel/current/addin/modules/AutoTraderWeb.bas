@@ -12,6 +12,7 @@ Const INPUT_DIR As String = "input"
 Const OUTPUT_DIR As String = "output"
 
 Const CANCEL_ORDER_CMD As String = "CANCEL_ORDER"
+Const CANCEL_ALL_ORDERS_CMD As String = "CANCEL_ALL_ORDERS"
 Const MODIFY_ORDER_CMD As String = "MODIFY_ORDER"
 Const CANCEL_CHILD_ORDER_CMD As String = "CANCEL_CHILD_ORDER"
 Const SQUARE_OFF_POSITION_CMD As String = "SQUARE_OFF_POSITION"
@@ -90,6 +91,13 @@ Public Function GetPortfolioMarginsFile(pseudoAccount As String) As String
 
 	GetPortfolioMarginsFile = GetOutputDirectory & Application.PathSeparator _
 		&  pseudoAccount & "-margins.csv"
+
+End Function
+
+Public Function GetPortfolioSummaryFile(pseudoAccount As String) As String
+
+	GetPortfolioSummaryFile = GetOutputDirectory & Application.PathSeparator _
+		&  pseudoAccount & "-summary.csv"
 
 End Function
 
@@ -399,6 +407,38 @@ Public Function CancelOrderChildren(PseudoAccount As String, _
     WriteCommand (csv)
         
     CancelOrderChildren = True
+
+Error_Handler:
+    If Err.Number <> 0 Then
+        
+        Dim Message As String
+        Message = "The Error Happened on Line : " & Erl & vbNewLine & _
+                        "Error Message : " & Err.Description & vbNewLine & _
+                        "Error Number : " & Err.Number & vbNewLine & vbNewLine & _
+                        CONTACT_SUPPORT
+                
+        MsgBox Message, vbOKOnly, "Error"
+        Resume Next
+
+    End If
+        
+End Function
+
+Public Function CancelAllOrders(PseudoAccount As String) As Boolean
+
+    On Error GoTo Error_Handler
+        
+    Dim csv As String
+    Dim cols(0 To 2) As String
+
+    cols(0) = CANCEL_ALL_ORDERS_CMD
+    cols(1) = PseudoAccount
+
+    csv = Join(cols, ",")
+        
+    WriteCommand (csv)
+        
+    CancelAllOrders = True
 
 Error_Handler:
     If Err.Number <> 0 Then
@@ -1129,4 +1169,85 @@ End Function
 
 ' *****************************************************************************
 ' ************************ MARGIN DETAIL FUNCTIONS - END ***********************
+' *****************************************************************************
+
+' *****************************************************************************
+' ************************ PORTFOLIO SUMMARY FUNCTIONS - START ******************
+' *****************************************************************************
+
+' Reads summary file and returns a column value.
+Public Function ReadSummaryColumn(pseudoAccount As String, _
+	columnIndex As Integer) As String
+    Dim filePath As String
+	filePath = GetPortfolioSummaryFile(pseudoAccount)
+	ReadSummaryColumn = FileReadCsvColumnByRowId( filePath, pseudoAccount, 1, columnIndex )
+End Function
+
+' Retrieve portfolio M2M.
+Public Function GetPortfolioMtm(pseudoAccount As String) As Double
+	GetPortfolioMtm = CDbl(ReadSummaryColumn(pseudoAccount, 2))
+End Function
+
+' Retrieve portfolio PNL.
+Public Function GetPortfolioPnl(pseudoAccount As String) As Double
+	GetPortfolioPnl = CDbl(ReadSummaryColumn(pseudoAccount, 3))
+End Function
+
+' Retrieve portfolio position count.
+Public Function GetPortfolioPositionCount(pseudoAccount As String) As Long
+	GetPortfolioPositionCount = CLng(ReadSummaryColumn(pseudoAccount, 4))
+End Function
+
+' Retrieve portfolio OPEN position count.
+Public Function GetPortfolioOpenPositionCount(pseudoAccount As String) As Long
+	GetPortfolioOpenPositionCount = CLng(ReadSummaryColumn(pseudoAccount, 5))
+End Function
+
+' Retrieve portfolio CLOSED position count.
+Public Function GetPortfolioClosedPositionCount(pseudoAccount As String) As Long
+	GetPortfolioClosedPositionCount = CLng(ReadSummaryColumn(pseudoAccount, 6))
+End Function
+
+' Retrieve portfolio open short quantity.
+Public Function GetPortfolioOpenShortQuantity(pseudoAccount As String) As Long
+	GetPortfolioOpenShortQuantity = CLng(ReadSummaryColumn(pseudoAccount, 7))
+End Function
+
+' Retrieve portfolio open long quantity.
+Public Function GetPortfolioOpenLongQuantity(pseudoAccount As String) As Long
+	GetPortfolioOpenLongQuantity = CLng(ReadSummaryColumn(pseudoAccount, 8))
+End Function
+
+' Retrieve portfolio order count.
+Public Function GetPortfolioOrderCount(pseudoAccount As String) As Long
+	GetPortfolioOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 9))
+End Function
+
+' Retrieve portfolio "open" order count.
+Public Function GetPortfolioOpenOrderCount(pseudoAccount As String) As Long
+	GetPortfolioOpenOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 10))
+End Function
+
+' Retrieve portfolio "complete" order count.
+Public Function GetPortfolioCompleteOrderCount(pseudoAccount As String) As Long
+	GetPortfolioCompleteOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 11))
+End Function
+
+' Retrieve portfolio "cancelled" order count.
+Public Function GetPortfolioCancelledOrderCount(pseudoAccount As String) As Long
+	GetPortfolioCancelledOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 12))
+End Function
+
+' Retrieve portfolio "rejected" order count.
+Public Function GetPortfolioRejectedOrderCount(pseudoAccount As String) As Long
+	GetPortfolioRejectedOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 13))
+End Function
+
+' Retrieve portfolio "trigger pending" order count.
+Public Function GetPortfolioTriggerPendingOrderCount(pseudoAccount As String) As Long
+	GetPortfolioTriggerPendingOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 14))
+End Function
+
+' *****************************************************************************
+' ************************ PORTFOLIO SUMMARY FUNCTIONS - END ********************
 ' *****************************************************************************
