@@ -1183,37 +1183,37 @@ Public Function ReadSummaryColumn(pseudoAccount As String, _
 	ReadSummaryColumn = FileReadCsvColumnByRowId( filePath, pseudoAccount, 1, columnIndex )
 End Function
 
-' Retrieve portfolio M2M.
+' Retrieve portfolio M2M (Position category = DAY).
 Public Function GetPortfolioMtm(pseudoAccount As String) As Double
 	GetPortfolioMtm = CDbl(ReadSummaryColumn(pseudoAccount, 2))
 End Function
 
-' Retrieve portfolio PNL.
+' Retrieve portfolio PNL (Position category = DAY).
 Public Function GetPortfolioPnl(pseudoAccount As String) As Double
 	GetPortfolioPnl = CDbl(ReadSummaryColumn(pseudoAccount, 3))
 End Function
 
-' Retrieve portfolio position count.
+' Retrieve portfolio position count (Position category = DAY).
 Public Function GetPortfolioPositionCount(pseudoAccount As String) As Long
 	GetPortfolioPositionCount = CLng(ReadSummaryColumn(pseudoAccount, 4))
 End Function
 
-' Retrieve portfolio OPEN position count.
+' Retrieve portfolio OPEN position count (Position category = DAY).
 Public Function GetPortfolioOpenPositionCount(pseudoAccount As String) As Long
 	GetPortfolioOpenPositionCount = CLng(ReadSummaryColumn(pseudoAccount, 5))
 End Function
 
-' Retrieve portfolio CLOSED position count.
+' Retrieve portfolio CLOSED position count (Position category = DAY).
 Public Function GetPortfolioClosedPositionCount(pseudoAccount As String) As Long
 	GetPortfolioClosedPositionCount = CLng(ReadSummaryColumn(pseudoAccount, 6))
 End Function
 
-' Retrieve portfolio open short quantity.
+' Retrieve portfolio open short quantity (Position category = DAY).
 Public Function GetPortfolioOpenShortQuantity(pseudoAccount As String) As Long
 	GetPortfolioOpenShortQuantity = CLng(ReadSummaryColumn(pseudoAccount, 7))
 End Function
 
-' Retrieve portfolio open long quantity.
+' Retrieve portfolio open long quantity (Position category = DAY).
 Public Function GetPortfolioOpenLongQuantity(pseudoAccount As String) As Long
 	GetPortfolioOpenLongQuantity = CLng(ReadSummaryColumn(pseudoAccount, 8))
 End Function
@@ -1246,6 +1246,41 @@ End Function
 ' Retrieve portfolio "trigger pending" order count.
 Public Function GetPortfolioTriggerPendingOrderCount(pseudoAccount As String) As Long
 	GetPortfolioTriggerPendingOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 14))
+End Function
+
+' Retrieve portfolio M2M (Position category = NET).
+Public Function GetPortfolioMtmNET(pseudoAccount As String) As Double
+	GetPortfolioMtmNET = CDbl(ReadSummaryColumn(pseudoAccount, 15))
+End Function
+
+' Retrieve portfolio PNL (Position category = NET).
+Public Function GetPortfolioPnlNET(pseudoAccount As String) As Double
+	GetPortfolioPnlNET = CDbl(ReadSummaryColumn(pseudoAccount, 16))
+End Function
+
+' Retrieve portfolio position count (Position category = NET).
+Public Function GetPortfolioPositionCountNET(pseudoAccount As String) As Long
+	GetPortfolioPositionCountNET = CLng(ReadSummaryColumn(pseudoAccount, 17))
+End Function
+
+' Retrieve portfolio OPEN position count (Position category = NET).
+Public Function GetPortfolioOpenPositionCountNET(pseudoAccount As String) As Long
+	GetPortfolioOpenPositionCountNET = CLng(ReadSummaryColumn(pseudoAccount, 18))
+End Function
+
+' Retrieve portfolio CLOSED position count (Position category = NET).
+Public Function GetPortfolioClosedPositionCountNET(pseudoAccount As String) As Long
+	GetPortfolioClosedPositionCountNET = CLng(ReadSummaryColumn(pseudoAccount, 19))
+End Function
+
+' Retrieve portfolio open short quantity (Position category = NET).
+Public Function GetPortfolioOpenShortQuantityNET(pseudoAccount As String) As Long
+	GetPortfolioOpenShortQuantityNET = CLng(ReadSummaryColumn(pseudoAccount, 20))
+End Function
+
+' Retrieve portfolio open long quantity (Position category = NET).
+Public Function GetPortfolioOpenLongQuantityNET(pseudoAccount As String) As Long
+	GetPortfolioOpenLongQuantityNET = CLng(ReadSummaryColumn(pseudoAccount, 21))
 End Function
 
 ' *****************************************************************************
