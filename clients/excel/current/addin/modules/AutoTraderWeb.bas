@@ -53,9 +53,28 @@ Private Sub Sleep(seconds As Integer)
 
 End Sub
 
+Function FileExists(FilePath As String) As Boolean
+    Dim TestStr As String
+    TestStr = ""
+    On Error Resume Next
+    TestStr = Dir(FilePath)
+    On Error GoTo 0
+    If TestStr = "" Then
+        FileExists = False
+    Else
+        FileExists = True
+    End If
+End Function
+
 Private Function GetIPCDirectory() As String
     
-    GetIPCDirectory = Environ("USERPROFILE") & Application.PathSeparator & "autotrader"
+    Dim Temp As String
+    Temp = Sheets("settings").Range("B2").Value
+    If (Trim(Temp) = "") Then
+        GetIPCDirectory = Environ("USERPROFILE") & Application.PathSeparator & "autotrader"
+    Else
+        GetIPCDirectory = Trim(Temp)
+    End If
 
 End Function
 
@@ -75,47 +94,47 @@ End Function
 
 Public Function GetPortfolioOrdersFile(pseudoAccount As String) As String
 
-	GetPortfolioOrdersFile = GetOutputDirectory & Application.PathSeparator _
-		&  pseudoAccount & "-orders.csv"
+    GetPortfolioOrdersFile = GetOutputDirectory & Application.PathSeparator _
+        & pseudoAccount & "-orders.csv"
 
 End Function
 
 Public Function GetPortfolioPositionsFile(pseudoAccount As String) As String
 
-	GetPortfolioPositionsFile = GetOutputDirectory & Application.PathSeparator _
-		&  pseudoAccount & "-positions.csv"
+    GetPortfolioPositionsFile = GetOutputDirectory & Application.PathSeparator _
+        & pseudoAccount & "-positions.csv"
 
 End Function
 
 Public Function GetPortfolioMarginsFile(pseudoAccount As String) As String
 
-	GetPortfolioMarginsFile = GetOutputDirectory & Application.PathSeparator _
-		&  pseudoAccount & "-margins.csv"
+    GetPortfolioMarginsFile = GetOutputDirectory & Application.PathSeparator _
+        & pseudoAccount & "-margins.csv"
 
 End Function
 
 Public Function GetPortfolioSummaryFile(pseudoAccount As String) As String
 
-	GetPortfolioSummaryFile = GetOutputDirectory & Application.PathSeparator _
-		&  pseudoAccount & "-summary.csv"
+    GetPortfolioSummaryFile = GetOutputDirectory & Application.PathSeparator _
+        & pseudoAccount & "-summary.csv"
 
 End Function
 
-Public Function FileReadCsvColumnByRowId(filePath As String, _
-	rowId As String, rowIdColumnIndex As Integer, columnIndex As Integer) As String
+Public Function FileReadCsvColumnByRowId(FilePath As String, _
+    rowId As String, rowIdColumnIndex As Integer, columnIndex As Integer) As String
     
     On Error GoTo Done
     
-    Dim temp As String
+    Dim Temp As String
     Dim cols() As String
 
     FileReadCsvColumnByRowId = ""
     
-    Open filePath For Input As #1
+    Open FilePath For Input As #1
     
     Do Until EOF(1)
-        Line Input #1, temp
-        cols = Split(temp, ",")
+        Line Input #1, Temp
+        cols = Split(Temp, ",")
         
         If cols(rowIdColumnIndex - 1) = rowId Then
             FileReadCsvColumnByRowId = cols(columnIndex - 1)
@@ -155,14 +174,12 @@ End Function
 
 Private Function ValidateFile(FilePath As String, Message As String) As Boolean
 
-    With (CreateObject("Scripting.FileSystemObject"))
-        If Not .FileExists(FilePath) Then
-            MsgBox Message, vbCritical, "Error"
-            ValidateFile = False
-        Else
-            ValidateFile = True
-        End If
-    End With
+    If FileExists(FilePath) Then
+        ValidateFile = True
+    Else
+        MsgBox Message, vbCritical, "Error"
+        ValidateFile = False
+    End If
 
 End Function
 
@@ -171,7 +188,7 @@ Private Sub WriteCommand(Command As String)
     Dim CommandsFilePath As String
     
     CommandsFilePath = GetCommandsFilePath()
-    If ValidateFile(CommandsFilePath, "AutoTrader client is not monitoring commands file.") = False Then
+    If ValidateFile(CommandsFilePath, "AutoTrader client is not monitoring commands file. " & CommandsFilePath) = False Then
         Exit Sub
     End If
 
@@ -210,7 +227,7 @@ Error_Handler:
 End Function
 
 Public Function PlaceOrderAdvanced(Variety As String, _
-    PseudoAccount As String, _
+    pseudoAccount As String, _
     Exchange As String, _
     Symbol As String, _
     TradeType As String, _
@@ -251,7 +268,7 @@ Public Function PlaceOrderAdvanced(Variety As String, _
     TmpValidity.FromString (Validity)
     o.Validity = TmpValidity
     
-    o.PseudoAccount = PseudoAccount
+    o.pseudoAccount = pseudoAccount
     o.Exchange = Exchange
     o.Symbol = Symbol
     o.Quantity = Quantity
@@ -270,7 +287,7 @@ Public Function PlaceOrderAdvanced(Variety As String, _
 End Function
         
 Public Function PlaceOrder( _
-    PseudoAccount As String, _
+    pseudoAccount As String, _
     Exchange As String, _
     Symbol As String, _
     TradeType As String, _
@@ -290,7 +307,7 @@ Public Function PlaceOrder( _
     Dim StrategyId As Integer: StrategyId = -1
     Dim Comments As String: Comments = ""
         
-    PlaceOrder = PlaceOrderAdvanced(Variety, PseudoAccount, _
+    PlaceOrder = PlaceOrderAdvanced(Variety, pseudoAccount, _
             Exchange, Symbol, TradeType, OrderType, ProductType, _
             Quantity, Price, TriggerPrice, Target, Stoploss, _
             TrailingStoploss, DisclosedQuantity, Validity, _
@@ -299,7 +316,7 @@ Public Function PlaceOrder( _
 End Function
         
 Public Function PlaceBracketOrder( _
-    PseudoAccount As String, _
+    pseudoAccount As String, _
     Exchange As String, _
     Symbol As String, _
     TradeType As String, _
@@ -319,7 +336,7 @@ Public Function PlaceBracketOrder( _
     Dim Comments As String: Comments = ""
     Dim ProductType As String: ProductType = PRODUCT_INTRADAY
 
-    PlaceBracketOrder = PlaceOrderAdvanced(Variety, PseudoAccount, _
+    PlaceBracketOrder = PlaceOrderAdvanced(Variety, pseudoAccount, _
             Exchange, Symbol, TradeType, OrderType, ProductType, _
             Quantity, Price, TriggerPrice, Target, Stoploss, _
             TrailingStoploss, DisclosedQuantity, Validity, _
@@ -328,7 +345,7 @@ Public Function PlaceBracketOrder( _
 End Function
 
 Public Function PlaceCoverOrder( _
-    PseudoAccount As String, _
+    pseudoAccount As String, _
     Exchange As String, _
     Symbol As String, _
     TradeType As String, _
@@ -348,7 +365,7 @@ Public Function PlaceCoverOrder( _
     Dim Stoploss As Double: Stoploss = 0
     Dim TrailingStoploss As Double: TrailingStoploss = 0
 
-    PlaceCoverOrder = PlaceOrderAdvanced(Variety, PseudoAccount, _
+    PlaceCoverOrder = PlaceOrderAdvanced(Variety, pseudoAccount, _
             Exchange, Symbol, TradeType, OrderType, ProductType, _
             Quantity, Price, TriggerPrice, Target, Stoploss, _
             TrailingStoploss, DisclosedQuantity, Validity, _
@@ -356,8 +373,8 @@ Public Function PlaceCoverOrder( _
 
 End Function
 
-Public Function CancelOrder(PseudoAccount As String, _
-        OrderId As String) As Boolean
+Public Function CancelOrder(pseudoAccount As String, _
+        orderId As String) As Boolean
 
     On Error GoTo Error_Handler
         
@@ -365,8 +382,8 @@ Public Function CancelOrder(PseudoAccount As String, _
     Dim cols(0 To 2) As String
 
     cols(0) = CANCEL_ORDER_CMD
-    cols(1) = PseudoAccount
-    cols(2) = OrderId
+    cols(1) = pseudoAccount
+    cols(2) = orderId
 
     csv = Join(cols, ",")
         
@@ -390,8 +407,8 @@ Error_Handler:
         
 End Function
 
-Public Function CancelOrderChildren(PseudoAccount As String, _
-        OrderId As String) As Boolean
+Public Function CancelOrderChildren(pseudoAccount As String, _
+        orderId As String) As Boolean
 
     On Error GoTo Error_Handler
         
@@ -399,8 +416,8 @@ Public Function CancelOrderChildren(PseudoAccount As String, _
     Dim cols(0 To 2) As String
 
     cols(0) = CANCEL_CHILD_ORDER_CMD
-    cols(1) = PseudoAccount
-    cols(2) = OrderId
+    cols(1) = pseudoAccount
+    cols(2) = orderId
 
     csv = Join(cols, ",")
         
@@ -424,7 +441,7 @@ Error_Handler:
         
 End Function
 
-Public Function CancelAllOrders(PseudoAccount As String) As Boolean
+Public Function CancelAllOrders(pseudoAccount As String) As Boolean
 
     On Error GoTo Error_Handler
         
@@ -432,7 +449,7 @@ Public Function CancelAllOrders(PseudoAccount As String) As Boolean
     Dim cols(0 To 2) As String
 
     cols(0) = CANCEL_ALL_ORDERS_CMD
-    cols(1) = PseudoAccount
+    cols(1) = pseudoAccount
 
     csv = Join(cols, ",")
         
@@ -456,8 +473,8 @@ Error_Handler:
         
 End Function
 
-Public Function ModifyOrder(PseudoAccount As String, _
-    OrderId As String, _
+Public Function ModifyOrder(pseudoAccount As String, _
+    orderId As String, _
     OrderType As String, _
     Quantity As Integer, _
     Price As Double, _
@@ -469,8 +486,8 @@ Public Function ModifyOrder(PseudoAccount As String, _
     Dim cols(0 To 6) As String
 
     cols(0) = MODIFY_ORDER_CMD
-    cols(1) = PseudoAccount
-    cols(2) = OrderId
+    cols(1) = pseudoAccount
+    cols(2) = orderId
     cols(3) = OrderType
     cols(4) = Quantity
     cols(5) = Price
@@ -498,19 +515,19 @@ Error_Handler:
         
 End Function
 
-Public Function ModifyOrderPrice(PseudoAccount As String, _
-    OrderId As String, _
+Public Function ModifyOrderPrice(pseudoAccount As String, _
+    orderId As String, _
     Price As Double) As Boolean
         
-    ModifyOrderPrice = ModifyOrder(PseudoAccount, OrderId, "", 0, Price, 0)
+    ModifyOrderPrice = ModifyOrder(pseudoAccount, orderId, "", 0, Price, 0)
 
 End Function
 
-Public Function ModifyOrderQuantity(PseudoAccount As String, _
-    OrderId As String, _
+Public Function ModifyOrderQuantity(pseudoAccount As String, _
+    orderId As String, _
     Quantity As Integer) As Boolean
 
-    ModifyOrderQuantity = ModifyOrder(PseudoAccount, OrderId, "", Quantity, 0, 0)
+    ModifyOrderQuantity = ModifyOrder(pseudoAccount, orderId, "", Quantity, 0, 0)
 
 End Function
 
@@ -518,12 +535,12 @@ End Function
 '
 ' pseudoAccount - account to which the position belongs
 ' category - position category (DAY, NET). Pass DAY if you are not sure.
-' type - position type (MIS, NRML, CNC, BO, CO) 
+' type - position type (MIS, NRML, CNC, BO, CO)
 ' independentExchange - broker independent exchange
 ' independentSymbol - broker independent symbol
-Public Function SquareOffPosition(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As Boolean
+Public Function SquareOffPosition(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Boolean
         
     On Error GoTo Error_Handler
         
@@ -563,8 +580,8 @@ End Function
 '
 ' pseudoAccount - account to which the position belongs
 ' category - position category (DAY, NET). Pass DAY if you are not sure.
-Public Function SquareOffPortfolio(pseudoAccount As String, _ 
-	category As String) As Boolean
+Public Function SquareOffPortfolio(pseudoAccount As String, _
+    category As String) As Boolean
         
     On Error GoTo Error_Handler
         
@@ -574,7 +591,7 @@ Public Function SquareOffPortfolio(pseudoAccount As String, _
     cols(0) = SQUARE_OFF_PORTFOLIO_CMD
     cols(1) = pseudoAccount
     cols(2) = category
-	
+    
     csv = Join(cols, ",")
         
     WriteCommand (csv)
@@ -602,7 +619,7 @@ Public Function isAutoTraderClientMonitoring() As Boolean
     
     CommandsFilePath = GetCommandsFilePath()
     isAutoTraderClientMonitoring = ValidateFile(CommandsFilePath, _
-        "AutoTrader client is not monitoring commands file.")
+        "AutoTrader client is not monitoring commands file. " & CommandsFilePath)
 
 End Function
 
@@ -612,231 +629,231 @@ End Function
 
 ' Reads orders file and returns a column value for the given order id.
 Public Function ReadOrderColumn(pseudoAccount As String, _
-	orderId As String, columnIndex As Integer) As String
-    Dim filePath As String
-	filePath = GetPortfolioOrdersFile(pseudoAccount)
-    ReadOrderColumn = FileReadCsvColumnByRowId( filePath, orderId, 3, columnIndex )
+    orderId As String, columnIndex As Integer) As String
+    Dim FilePath As String
+    FilePath = GetPortfolioOrdersFile(pseudoAccount)
+    ReadOrderColumn = FileReadCsvColumnByRowId(FilePath, orderId, 3, columnIndex)
 End Function
 
 ' Retrieve order's trading account.
 Public Function GetOrderTradingAccount(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderTradingAccount = ReadOrderColumn(pseudoAccount, orderId, 2)
+    orderId As String) As String
+    GetOrderTradingAccount = ReadOrderColumn(pseudoAccount, orderId, 2)
 End Function
 
 ' Retrieve order's trading platform id.
 Public Function GetOrderId(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderId = ReadOrderColumn(pseudoAccount, orderId, 4)
+    orderId As String) As String
+    GetOrderId = ReadOrderColumn(pseudoAccount, orderId, 4)
 End Function
 
 ' Retrieve order's exchange id.
 Public Function GetOrderExchangeId(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderExchangeId = ReadOrderColumn(pseudoAccount, orderId, 5)
+    orderId As String) As String
+    GetOrderExchangeId = ReadOrderColumn(pseudoAccount, orderId, 5)
 End Function
 
 ' Retrieve order's variety (REGULAR, BO, CO).
 Public Function GetOrderVariety(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderVariety = ReadOrderColumn(pseudoAccount, orderId, 6)
+    orderId As String) As String
+    GetOrderVariety = ReadOrderColumn(pseudoAccount, orderId, 6)
 End Function
 
 ' Retrieve order's (platform independent) exchange.
 Public Function GetOrderIndependentExchange(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderIndependentExchange = ReadOrderColumn(pseudoAccount, orderId, 7)
+    orderId As String) As String
+    GetOrderIndependentExchange = ReadOrderColumn(pseudoAccount, orderId, 7)
 End Function
 
 ' Retrieve order's (platform independent) symbol.
 Public Function GetOrderIndependentSymbol(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderIndependentSymbol = ReadOrderColumn(pseudoAccount, orderId, 8)
+    orderId As String) As String
+    GetOrderIndependentSymbol = ReadOrderColumn(pseudoAccount, orderId, 8)
 End Function
 
 ' Retrieve order's trade type (BUY, SELL).
 Public Function GetOrderTradeType(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderTradeType = ReadOrderColumn(pseudoAccount, orderId, 9)
+    orderId As String) As String
+    GetOrderTradeType = ReadOrderColumn(pseudoAccount, orderId, 9)
 End Function
 
 ' Retrieve order's order type (LIMIT, MARKET, STOP_LOSS, SL_MARKET).
 Public Function GetOrderOrderType(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderOrderType = ReadOrderColumn(pseudoAccount, orderId, 10)
+    orderId As String) As String
+    GetOrderOrderType = ReadOrderColumn(pseudoAccount, orderId, 10)
 End Function
 
 ' Retrieve order's product type (INTRADAY, DELIVERY, NORMAL).
 Public Function GetOrderProductType(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderProductType = ReadOrderColumn(pseudoAccount, orderId, 11)
+    orderId As String) As String
+    GetOrderProductType = ReadOrderColumn(pseudoAccount, orderId, 11)
 End Function
 
 ' Retrieve order's quantity.
 Public Function GetOrderQuantity(pseudoAccount As String, _
-	orderId As String) As Long
-	GetOrderQuantity = CLng(ReadOrderColumn(pseudoAccount, orderId, 12))
+    orderId As String) As Long
+    GetOrderQuantity = CLng(ReadOrderColumn(pseudoAccount, orderId, 12))
 End Function
 
 ' Retrieve order's price.
 Public Function GetOrderPrice(pseudoAccount As String, _
-	orderId As String) As Double
-	GetOrderPrice = CDbl(ReadOrderColumn(pseudoAccount, orderId, 13))
+    orderId As String) As Double
+    GetOrderPrice = CDbl(ReadOrderColumn(pseudoAccount, orderId, 13))
 End Function
 
 ' Retrieve order's trigger price.
 Public Function GetOrderTriggerPrice(pseudoAccount As String, _
-	orderId As String) As Double
-	GetOrderTriggerPrice = CDbl(ReadOrderColumn(pseudoAccount, orderId, 14))
+    orderId As String) As Double
+    GetOrderTriggerPrice = CDbl(ReadOrderColumn(pseudoAccount, orderId, 14))
 End Function
 
 ' Retrieve order's filled quantity.
 Public Function GetOrderFilledQuantity(pseudoAccount As String, _
-	orderId As String) As Long
-	GetOrderFilledQuantity = CLng(ReadOrderColumn(pseudoAccount, orderId, 15))
+    orderId As String) As Long
+    GetOrderFilledQuantity = CLng(ReadOrderColumn(pseudoAccount, orderId, 15))
 End Function
 
 ' Retrieve order's pending quantity.
 Public Function GetOrderPendingQuantity(pseudoAccount As String, _
-	orderId As String) As Long
-	GetOrderPendingQuantity = CLng(ReadOrderColumn(pseudoAccount, orderId, 16))
+    orderId As String) As Long
+    GetOrderPendingQuantity = CLng(ReadOrderColumn(pseudoAccount, orderId, 16))
 End Function
 
 ' Retrieve order's (platform independent) status.
 ' (OPEN, COMPLETE, CANCELLED, REJECTED, TRIGGER_PENDING, UNKNOWN)
 Public Function GetOrderStatus(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderStatus = ReadOrderColumn(pseudoAccount, orderId, 17)
+    orderId As String) As String
+    GetOrderStatus = ReadOrderColumn(pseudoAccount, orderId, 17)
 End Function
 
 ' Retrieve order's status message or rejection reason.
 Public Function GetOrderStatusMessage(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderStatusMessage = ReadOrderColumn(pseudoAccount, orderId, 18)
+    orderId As String) As String
+    GetOrderStatusMessage = ReadOrderColumn(pseudoAccount, orderId, 18)
 End Function
 
 ' Retrieve order's validity (DAY, IOC).
 Public Function GetOrderValidity(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderValidity = ReadOrderColumn(pseudoAccount, orderId, 19)
+    orderId As String) As String
+    GetOrderValidity = ReadOrderColumn(pseudoAccount, orderId, 19)
 End Function
 
 ' Retrieve order's average price at which it got traded.
 Public Function GetOrderAveragePrice(pseudoAccount As String, _
-	orderId As String) As Double
-	GetOrderAveragePrice = CDbl(ReadOrderColumn(pseudoAccount, orderId, 20))
+    orderId As String) As Double
+    GetOrderAveragePrice = CDbl(ReadOrderColumn(pseudoAccount, orderId, 20))
 End Function
 
 ' Retrieve order's parent order id. The id of parent bracket or cover order.
 Public Function GetOrderParentOrderId(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderParentOrderId = ReadOrderColumn(pseudoAccount, orderId, 21)
+    orderId As String) As String
+    GetOrderParentOrderId = ReadOrderColumn(pseudoAccount, orderId, 21)
 End Function
 
 ' Retrieve order's disclosed quantity.
 Public Function GetOrderDisclosedQuantity(pseudoAccount As String, _
-	orderId As String) As Long
-	GetOrderDisclosedQuantity = CLng(ReadOrderColumn(pseudoAccount, orderId, 22))
+    orderId As String) As Long
+    GetOrderDisclosedQuantity = CLng(ReadOrderColumn(pseudoAccount, orderId, 22))
 End Function
 
 ' Retrieve order's exchange time as a string (YYYY-MM-DD HH:MM:SS.MILLIS).
 Public Function GetOrderExchangeTime(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderExchangeTime = ReadOrderColumn(pseudoAccount, orderId, 23)
+    orderId As String) As String
+    GetOrderExchangeTime = ReadOrderColumn(pseudoAccount, orderId, 23)
 End Function
 
 ' Retrieve order's platform time as a string (YYYY-MM-DD HH:MM:SS.MILLIS).
 Public Function GetOrderPlatformTime(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderPlatformTime = ReadOrderColumn(pseudoAccount, orderId, 24)
+    orderId As String) As String
+    GetOrderPlatformTime = ReadOrderColumn(pseudoAccount, orderId, 24)
 End Function
 
 ' Retrieve order's AMO (after market order) flag. (true/false)
 Public Function GetOrderAmo(pseudoAccount As String, _
-	orderId As String) As Boolean
-	Dim flag As String
-	flag = ReadOrderColumn(pseudoAccount, orderId, 25)
-	GetOrderAmo = (LCase(flag) = "true")
+    orderId As String) As Boolean
+    Dim flag As String
+    flag = ReadOrderColumn(pseudoAccount, orderId, 25)
+    GetOrderAmo = (LCase(flag) = "true")
 End Function
 
 ' Retrieve order's comments.
 Public Function GetOrderComments(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderComments = ReadOrderColumn(pseudoAccount, orderId, 26)
+    orderId As String) As String
+    GetOrderComments = ReadOrderColumn(pseudoAccount, orderId, 26)
 End Function
 
 ' Retrieve order's raw (platform specific) status.
 Public Function GetOrderRawStatus(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderRawStatus = ReadOrderColumn(pseudoAccount, orderId, 27)
+    orderId As String) As String
+    GetOrderRawStatus = ReadOrderColumn(pseudoAccount, orderId, 27)
 End Function
 
 ' Retrieve order's (platform specific) exchange.
 Public Function GetOrderExchange(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderExchange = ReadOrderColumn(pseudoAccount, orderId, 28)
+    orderId As String) As String
+    GetOrderExchange = ReadOrderColumn(pseudoAccount, orderId, 28)
 End Function
 
 ' Retrieve order's (platform specific) symbol.
 Public Function GetOrderSymbol(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderSymbol = ReadOrderColumn(pseudoAccount, orderId, 29)
+    orderId As String) As String
+    GetOrderSymbol = ReadOrderColumn(pseudoAccount, orderId, 29)
 End Function
 
 ' Retrieve order's date (DD-MM-YYYY).
 Public Function GetOrderDay(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderDay = ReadOrderColumn(pseudoAccount, orderId, 30)
+    orderId As String) As String
+    GetOrderDay = ReadOrderColumn(pseudoAccount, orderId, 30)
 End Function
 
 ' Retrieve order's trading platform.
 Public Function GetOrderPlatform(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderPlatform = ReadOrderColumn(pseudoAccount, orderId, 31)
+    orderId As String) As String
+    GetOrderPlatform = ReadOrderColumn(pseudoAccount, orderId, 31)
 End Function
 
 ' Retrieve order's client id (as received from trading platform).
 Public Function GetOrderClientId(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderClientId = ReadOrderColumn(pseudoAccount, orderId, 32)
+    orderId As String) As String
+    GetOrderClientId = ReadOrderColumn(pseudoAccount, orderId, 32)
 End Function
 
 ' Retrieve order's stock broker.
 Public Function GetOrderStockBroker(pseudoAccount As String, _
-	orderId As String) As String
-	GetOrderStockBroker = ReadOrderColumn(pseudoAccount, orderId, 33)
+    orderId As String) As String
+    GetOrderStockBroker = ReadOrderColumn(pseudoAccount, orderId, 33)
 End Function
 
 ' Checks whether order is open.
 Public Function IsOrderOpen(pseudoAccount As String, _
-	orderId As String) As Boolean
-	Dim oStatus As String
-	oStatus = getOrderStatus(pseudoAccount, orderId)
-	IsOrderOpen = (UCase(oStatus) = "OPEN" OR UCase(oStatus) = "TRIGGER_PENDING")
+    orderId As String) As Boolean
+    Dim oStatus As String
+    oStatus = GetOrderStatus(pseudoAccount, orderId)
+    IsOrderOpen = (UCase(oStatus) = "OPEN" Or UCase(oStatus) = "TRIGGER_PENDING")
 End Function
 
 ' Checks whether order is complete.
 Public Function IsOrderComplete(pseudoAccount As String, _
-	orderId As String) As Boolean
-	Dim oStatus As String
-	oStatus = getOrderStatus(pseudoAccount, orderId)	
-	IsOrderComplete = UCase(oStatus) = "COMPLETE"
+    orderId As String) As Boolean
+    Dim oStatus As String
+    oStatus = GetOrderStatus(pseudoAccount, orderId)
+    IsOrderComplete = UCase(oStatus) = "COMPLETE"
 End Function
 
 ' Checks whether order is rejected.
 Public Function IsOrderRejected(pseudoAccount As String, _
-	orderId As String) As Boolean
-	Dim oStatus As String
-	oStatus = getOrderStatus(pseudoAccount, orderId)
-	IsOrderRejected = UCase(oStatus) = "REJECTED"
+    orderId As String) As Boolean
+    Dim oStatus As String
+    oStatus = GetOrderStatus(pseudoAccount, orderId)
+    IsOrderRejected = UCase(oStatus) = "REJECTED"
 End Function
 
 ' Checks whether order is cancelled.
 Public Function IsOrderCancelled(pseudoAccount As String, _
-	orderId As String) As Boolean
-	Dim oStatus As String
-	oStatus = getOrderStatus(pseudoAccount, orderId)
-	IsOrderCancelled = UCase(oStatus) = "CANCELLED"
+    orderId As String) As Boolean
+    Dim oStatus As String
+    oStatus = GetOrderStatus(pseudoAccount, orderId)
+    IsOrderCancelled = UCase(oStatus) = "CANCELLED"
 End Function
 
 ' *****************************************************************************
@@ -850,37 +867,37 @@ End Function
 
 ' Reads positions file and returns a column value for the given position id.
 ' Position id is a combination of category, type, independentExchange & independentSymbol.
-Public Function ReadPositionColumnInternal(pseudoAccount As String, _ 
-	category As String, categoryColumnIndex As Integer,	_
-	posType As String, typeColumnIndex As Integer, _
-	independentExchange As String, independentExchangeColumnIndex As Integer, _
-	independentSymbol As String, independentSymbolColumnIndex As Integer, _
-	columnIndex As Integer) As String
-	
+Public Function ReadPositionColumnInternal(pseudoAccount As String, _
+    category As String, categoryColumnIndex As Integer, _
+    posType As String, typeColumnIndex As Integer, _
+    independentExchange As String, independentExchangeColumnIndex As Integer, _
+    independentSymbol As String, independentSymbolColumnIndex As Integer, _
+    columnIndex As Integer) As String
+    
     On Error GoTo Done
     
-    Dim temp As String
+    Dim Temp As String
     Dim cols() As String
-	Dim filePath As String
-	
-	filePath = GetPortfolioPositionsFile(pseudoAccount)
+    Dim FilePath As String
+    
+    FilePath = GetPortfolioPositionsFile(pseudoAccount)
     ReadPositionColumnInternal = ""
     
-    Open filePath For Input As #1
+    Open FilePath For Input As #1
     
     Do Until EOF(1)
-        Line Input #1, temp
-        cols = Split(temp, ",")
+        Line Input #1, Temp
+        cols = Split(Temp, ",")
         
-        If (cols(categoryColumnIndex - 1) = category) AND _
-			(cols(typeColumnIndex - 1) = posType) AND _
-			(cols(independentExchangeColumnIndex - 1) = independentExchange) AND _
-			(cols(independentSymbolColumnIndex - 1) = independentSymbol) _			
-		Then
+        If (cols(categoryColumnIndex - 1) = category) And _
+            (cols(typeColumnIndex - 1) = posType) And _
+            (cols(independentExchangeColumnIndex - 1) = independentExchange) And _
+            (cols(independentSymbolColumnIndex - 1) = independentSymbol) _
+        Then
             ReadPositionColumnInternal = cols(columnIndex - 1)
             Exit Do
         End If
-			
+            
     Loop
     
     Close #1
@@ -898,193 +915,193 @@ Done:
         Resume Next
 
     End If
-    	
+        
 End Function
 
 ' Reads positions file and returns a column value for the given position id.
 ' Position id is a combination of category, type, independentExchange & independentSymbol.
-Public Function ReadPositionColumn(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String, columnIndex As Integer) As String
-	
-	ReadPositionColumn = ReadPositionColumnInternal(pseudoAccount, _
-		category, 4, posType, 3,	independentExchange, 5, independentSymbol, 6, columnIndex)
+Public Function ReadPositionColumn(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String, columnIndex As Integer) As String
+    
+    ReadPositionColumn = ReadPositionColumnInternal(pseudoAccount, _
+        category, 4, posType, 3, independentExchange, 5, independentSymbol, 6, columnIndex)
 End Function
 
 ' Retrieve positions's trading account.
-Public Function GetPositionTradingAccount(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As String
-	GetPositionTradingAccount = ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 2)
+Public Function GetPositionTradingAccount(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As String
+    GetPositionTradingAccount = ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 2)
 End Function
 
 ' Retrieve positions's MTM.
-Public Function GetPositionMtm(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As Double
-	GetPositionMtm = CDbl(ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 7))
+Public Function GetPositionMtm(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Double
+    GetPositionMtm = CDbl(ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 7))
 End Function
 
 ' Retrieve positions's PNL.
-Public Function GetPositionPnl(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As Double
-	GetPositionPnl = CDbl(ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 8))
+Public Function GetPositionPnl(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Double
+    GetPositionPnl = CDbl(ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 8))
 End Function
 
 ' Retrieve positions's buy quantity.
-Public Function GetPositionBuyQuantity(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As Long
-	GetPositionBuyQuantity = CLng(ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 9))
+Public Function GetPositionBuyQuantity(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Long
+    GetPositionBuyQuantity = CLng(ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 9))
 End Function
 
 ' Retrieve positions's sell quantity.
-Public Function GetPositionSellQuantity(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As Long
-	GetPositionSellQuantity = CLng(ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 10))
+Public Function GetPositionSellQuantity(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Long
+    GetPositionSellQuantity = CLng(ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 10))
 End Function
 
 ' Retrieve positions's net quantity.
-Public Function GetPositionNetQuantity(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As Long
-	GetPositionNetQuantity = CLng(ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 11))
+Public Function GetPositionNetQuantity(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Long
+    GetPositionNetQuantity = CLng(ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 11))
 End Function
 
 ' Retrieve positions's buy value.
-Public Function GetPositionBuyValue(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As Double
-	GetPositionBuyValue = CDbl(ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 12))
+Public Function GetPositionBuyValue(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Double
+    GetPositionBuyValue = CDbl(ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 12))
 End Function
 
 ' Retrieve positions's sell value.
-Public Function GetPositionSellValue(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As Double
-	GetPositionSellValue = CDbl(ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 13))
+Public Function GetPositionSellValue(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Double
+    GetPositionSellValue = CDbl(ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 13))
 End Function
 
 ' Retrieve positions's net value.
-Public Function GetPositionNetValue(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As Double
-	GetPositionNetValue = CDbl(ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 14))
+Public Function GetPositionNetValue(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Double
+    GetPositionNetValue = CDbl(ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 14))
 End Function
 
 ' Retrieve positions's buy average price.
-Public Function GetPositionBuyAvgPrice(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As Double
-	GetPositionBuyAvgPrice = CDbl(ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 15))
+Public Function GetPositionBuyAvgPrice(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Double
+    GetPositionBuyAvgPrice = CDbl(ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 15))
 End Function
 
 ' Retrieve positions's sell average price.
-Public Function GetPositionSellAvgPrice(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As Double
-	GetPositionSellAvgPrice = CDbl(ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 16))
+Public Function GetPositionSellAvgPrice(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Double
+    GetPositionSellAvgPrice = CDbl(ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 16))
 End Function
 
 ' Retrieve positions's realised pnl.
-Public Function GetPositionRealisedPnl(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As Double
-	GetPositionRealisedPnl = CDbl(ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 17))
+Public Function GetPositionRealisedPnl(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Double
+    GetPositionRealisedPnl = CDbl(ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 17))
 End Function
 
 ' Retrieve positions's unrealised pnl.
-Public Function GetPositionUnrealisedPnl(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As Double
-	GetPositionUnrealisedPnl = CDbl(ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 18))
+Public Function GetPositionUnrealisedPnl(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Double
+    GetPositionUnrealisedPnl = CDbl(ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 18))
 End Function
 
 ' Retrieve positions's overnight quantity.
-Public Function GetPositionOvernightQuantity(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As Long
-	GetPositionOvernightQuantity = CLng(ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 19))
+Public Function GetPositionOvernightQuantity(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Long
+    GetPositionOvernightQuantity = CLng(ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 19))
 End Function
 
 ' Retrieve positions's multiplier.
-Public Function GetPositionMultiplier(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As Long
-	GetPositionMultiplier = CLng(ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 20))
+Public Function GetPositionMultiplier(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Long
+    GetPositionMultiplier = CLng(ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 20))
 End Function
 
 ' Retrieve positions's LTP.
-Public Function GetPositionLtp(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As Double
-	GetPositionLtp = CDbl(ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 21))
+Public Function GetPositionLtp(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Double
+    GetPositionLtp = CDbl(ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 21))
 End Function
 
 ' Retrieve positions's (platform specific) exchange.
-Public Function GetPositionExchange(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As String
-	GetPositionExchange = ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 22)
+Public Function GetPositionExchange(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As String
+    GetPositionExchange = ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 22)
 End Function
 
 ' Retrieve positions's (platform specific) symbol.
-Public Function GetPositionSymbol(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As String
-	GetPositionSymbol = ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 23)
+Public Function GetPositionSymbol(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As String
+    GetPositionSymbol = ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 23)
 End Function
 
 ' Retrieve positions's date (DD-MM-YYYY).
-Public Function GetPositionDay(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As String
-	GetPositionDay = ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 24)
+Public Function GetPositionDay(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As String
+    GetPositionDay = ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 24)
 End Function
 
 ' Retrieve positions's trading platform.
-Public Function GetPositionPlatform(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As String
-	GetPositionPlatform = ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 25)
+Public Function GetPositionPlatform(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As String
+    GetPositionPlatform = ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 25)
 End Function
 
 ' Retrieve positions's account id as received from trading platform.
-Public Function GetPositionAccountId(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As String
-	GetPositionAccountId = ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 26)
+Public Function GetPositionAccountId(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As String
+    GetPositionAccountId = ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 26)
 End Function
 
 ' Retrieve positions's stock broker.
-Public Function GetPositionStockBroker(pseudoAccount As String, _ 
-	category As String, posType As String, independentExchange As String, _
-	independentSymbol As String) As String
-	GetPositionStockBroker = ReadPositionColumn(pseudoAccount, _
-		category, posType, independentExchange, independentSymbol, 28)
+Public Function GetPositionStockBroker(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As String
+    GetPositionStockBroker = ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 28)
 End Function
 
 ' *****************************************************************************
@@ -1098,73 +1115,73 @@ End Function
 
 ' Reads margins file and returns a column value for the given margin category.
 Public Function ReadMarginColumn(pseudoAccount As String, _
-	category As String, columnIndex As Integer) As String
-    Dim filePath As String
-	filePath = GetPortfolioMarginsFile(pseudoAccount)
-	ReadMarginColumn = FileReadCsvColumnByRowId( filePath, category, 3, columnIndex )
+    category As String, columnIndex As Integer) As String
+    Dim FilePath As String
+    FilePath = GetPortfolioMarginsFile(pseudoAccount)
+    ReadMarginColumn = FileReadCsvColumnByRowId(FilePath, category, 3, columnIndex)
 End Function
 
 ' Retrieve margin funds.
 Public Function GetMarginFunds(pseudoAccount As String, _
-	category As String) As Double
-	GetMarginFunds = CDbl(ReadMarginColumn(pseudoAccount, category, 4))
+    category As String) As Double
+    GetMarginFunds = CDbl(ReadMarginColumn(pseudoAccount, category, 4))
 End Function
 
 ' Retrieve margin utilized.
 Public Function GetMarginUtilized(pseudoAccount As String, _
-	category As String) As Double
-	GetMarginUtilized = CDbl(ReadMarginColumn(pseudoAccount, category, 5))
+    category As String) As Double
+    GetMarginUtilized = CDbl(ReadMarginColumn(pseudoAccount, category, 5))
 End Function
 
 ' Retrieve margin available.
 Public Function GetMarginAvailable(pseudoAccount As String, _
-	category As String) As Double
-	GetMarginAvailable = CDbl(ReadMarginColumn(pseudoAccount, category, 6))
+    category As String) As Double
+    GetMarginAvailable = CDbl(ReadMarginColumn(pseudoAccount, category, 6))
 End Function
 
 ' Retrieve margin funds for equity category.
 Public Function GetMarginFundsEquity(pseudoAccount As String) As Double
-	GetMarginFundsEquity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_EQUITY, 4))
+    GetMarginFundsEquity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_EQUITY, 4))
 End Function
 
 ' Retrieve margin utilized for equity category.
 Public Function GetMarginUtilizedEquity(pseudoAccount As String) As Double
-	GetMarginUtilizedEquity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_EQUITY, 5))
+    GetMarginUtilizedEquity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_EQUITY, 5))
 End Function
 
 ' Retrieve margin available for equity category.
 Public Function GetMarginAvailableEquity(pseudoAccount As String) As Double
-	GetMarginAvailableEquity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_EQUITY, 6))
+    GetMarginAvailableEquity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_EQUITY, 6))
 End Function
 
 ' Retrieve margin funds for commodity category.
 Public Function GetMarginFundsCommodity(pseudoAccount As String) As Double
-	GetMarginFundsCommodity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_COMMODITY, 4))
+    GetMarginFundsCommodity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_COMMODITY, 4))
 End Function
 
 ' Retrieve margin utilized for commodity category.
 Public Function GetMarginUtilizedCommodity(pseudoAccount As String) As Double
-	GetMarginUtilizedCommodity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_COMMODITY, 5))
+    GetMarginUtilizedCommodity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_COMMODITY, 5))
 End Function
 
 ' Retrieve margin available for commodity category.
 Public Function GetMarginAvailableCommodity(pseudoAccount As String) As Double
-	GetMarginAvailableCommodity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_COMMODITY, 6))
+    GetMarginAvailableCommodity = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_COMMODITY, 6))
 End Function
 
 ' Retrieve margin funds for entire account.
 Public Function GetMarginFundsAll(pseudoAccount As String) As Double
-	GetMarginFundsAll = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_ALL, 4))
+    GetMarginFundsAll = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_ALL, 4))
 End Function
 
 ' Retrieve margin utilized for entire account.
 Public Function GetMarginUtilizedAll(pseudoAccount As String) As Double
-	GetMarginUtilizedAll = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_ALL, 5))
+    GetMarginUtilizedAll = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_ALL, 5))
 End Function
 
 ' Retrieve margin available for entire account.
 Public Function GetMarginAvailableAll(pseudoAccount As String) As Double
-	GetMarginAvailableAll = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_ALL, 6))
+    GetMarginAvailableAll = CDbl(ReadMarginColumn(pseudoAccount, MARGIN_ALL, 6))
 End Function
 
 ' *****************************************************************************
@@ -1177,112 +1194,113 @@ End Function
 
 ' Reads summary file and returns a column value.
 Public Function ReadSummaryColumn(pseudoAccount As String, _
-	columnIndex As Integer) As String
-    Dim filePath As String
-	filePath = GetPortfolioSummaryFile(pseudoAccount)
-	ReadSummaryColumn = FileReadCsvColumnByRowId( filePath, pseudoAccount, 1, columnIndex )
+    columnIndex As Integer) As String
+    Dim FilePath As String
+    FilePath = GetPortfolioSummaryFile(pseudoAccount)
+    ReadSummaryColumn = FileReadCsvColumnByRowId(FilePath, pseudoAccount, 1, columnIndex)
 End Function
 
 ' Retrieve portfolio M2M (Position category = DAY).
 Public Function GetPortfolioMtm(pseudoAccount As String) As Double
-	GetPortfolioMtm = CDbl(ReadSummaryColumn(pseudoAccount, 2))
+    GetPortfolioMtm = CDbl(ReadSummaryColumn(pseudoAccount, 2))
 End Function
 
 ' Retrieve portfolio PNL (Position category = DAY).
 Public Function GetPortfolioPnl(pseudoAccount As String) As Double
-	GetPortfolioPnl = CDbl(ReadSummaryColumn(pseudoAccount, 3))
+    GetPortfolioPnl = CDbl(ReadSummaryColumn(pseudoAccount, 3))
 End Function
 
 ' Retrieve portfolio position count (Position category = DAY).
 Public Function GetPortfolioPositionCount(pseudoAccount As String) As Long
-	GetPortfolioPositionCount = CLng(ReadSummaryColumn(pseudoAccount, 4))
+    GetPortfolioPositionCount = CLng(ReadSummaryColumn(pseudoAccount, 4))
 End Function
 
 ' Retrieve portfolio OPEN position count (Position category = DAY).
 Public Function GetPortfolioOpenPositionCount(pseudoAccount As String) As Long
-	GetPortfolioOpenPositionCount = CLng(ReadSummaryColumn(pseudoAccount, 5))
+    GetPortfolioOpenPositionCount = CLng(ReadSummaryColumn(pseudoAccount, 5))
 End Function
 
 ' Retrieve portfolio CLOSED position count (Position category = DAY).
 Public Function GetPortfolioClosedPositionCount(pseudoAccount As String) As Long
-	GetPortfolioClosedPositionCount = CLng(ReadSummaryColumn(pseudoAccount, 6))
+    GetPortfolioClosedPositionCount = CLng(ReadSummaryColumn(pseudoAccount, 6))
 End Function
 
 ' Retrieve portfolio open short quantity (Position category = DAY).
 Public Function GetPortfolioOpenShortQuantity(pseudoAccount As String) As Long
-	GetPortfolioOpenShortQuantity = CLng(ReadSummaryColumn(pseudoAccount, 7))
+    GetPortfolioOpenShortQuantity = CLng(ReadSummaryColumn(pseudoAccount, 7))
 End Function
 
 ' Retrieve portfolio open long quantity (Position category = DAY).
 Public Function GetPortfolioOpenLongQuantity(pseudoAccount As String) As Long
-	GetPortfolioOpenLongQuantity = CLng(ReadSummaryColumn(pseudoAccount, 8))
+    GetPortfolioOpenLongQuantity = CLng(ReadSummaryColumn(pseudoAccount, 8))
 End Function
 
 ' Retrieve portfolio order count.
 Public Function GetPortfolioOrderCount(pseudoAccount As String) As Long
-	GetPortfolioOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 9))
+    GetPortfolioOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 9))
 End Function
 
 ' Retrieve portfolio "open" order count.
 Public Function GetPortfolioOpenOrderCount(pseudoAccount As String) As Long
-	GetPortfolioOpenOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 10))
+    GetPortfolioOpenOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 10))
 End Function
 
 ' Retrieve portfolio "complete" order count.
 Public Function GetPortfolioCompleteOrderCount(pseudoAccount As String) As Long
-	GetPortfolioCompleteOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 11))
+    GetPortfolioCompleteOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 11))
 End Function
 
 ' Retrieve portfolio "cancelled" order count.
 Public Function GetPortfolioCancelledOrderCount(pseudoAccount As String) As Long
-	GetPortfolioCancelledOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 12))
+    GetPortfolioCancelledOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 12))
 End Function
 
 ' Retrieve portfolio "rejected" order count.
 Public Function GetPortfolioRejectedOrderCount(pseudoAccount As String) As Long
-	GetPortfolioRejectedOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 13))
+    GetPortfolioRejectedOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 13))
 End Function
 
 ' Retrieve portfolio "trigger pending" order count.
 Public Function GetPortfolioTriggerPendingOrderCount(pseudoAccount As String) As Long
-	GetPortfolioTriggerPendingOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 14))
+    GetPortfolioTriggerPendingOrderCount = CLng(ReadSummaryColumn(pseudoAccount, 14))
 End Function
 
 ' Retrieve portfolio M2M (Position category = NET).
 Public Function GetPortfolioMtmNET(pseudoAccount As String) As Double
-	GetPortfolioMtmNET = CDbl(ReadSummaryColumn(pseudoAccount, 15))
+    GetPortfolioMtmNET = CDbl(ReadSummaryColumn(pseudoAccount, 15))
 End Function
 
 ' Retrieve portfolio PNL (Position category = NET).
 Public Function GetPortfolioPnlNET(pseudoAccount As String) As Double
-	GetPortfolioPnlNET = CDbl(ReadSummaryColumn(pseudoAccount, 16))
+    GetPortfolioPnlNET = CDbl(ReadSummaryColumn(pseudoAccount, 16))
 End Function
 
 ' Retrieve portfolio position count (Position category = NET).
 Public Function GetPortfolioPositionCountNET(pseudoAccount As String) As Long
-	GetPortfolioPositionCountNET = CLng(ReadSummaryColumn(pseudoAccount, 17))
+    GetPortfolioPositionCountNET = CLng(ReadSummaryColumn(pseudoAccount, 17))
 End Function
 
 ' Retrieve portfolio OPEN position count (Position category = NET).
 Public Function GetPortfolioOpenPositionCountNET(pseudoAccount As String) As Long
-	GetPortfolioOpenPositionCountNET = CLng(ReadSummaryColumn(pseudoAccount, 18))
+    GetPortfolioOpenPositionCountNET = CLng(ReadSummaryColumn(pseudoAccount, 18))
 End Function
 
 ' Retrieve portfolio CLOSED position count (Position category = NET).
 Public Function GetPortfolioClosedPositionCountNET(pseudoAccount As String) As Long
-	GetPortfolioClosedPositionCountNET = CLng(ReadSummaryColumn(pseudoAccount, 19))
+    GetPortfolioClosedPositionCountNET = CLng(ReadSummaryColumn(pseudoAccount, 19))
 End Function
 
 ' Retrieve portfolio open short quantity (Position category = NET).
 Public Function GetPortfolioOpenShortQuantityNET(pseudoAccount As String) As Long
-	GetPortfolioOpenShortQuantityNET = CLng(ReadSummaryColumn(pseudoAccount, 20))
+    GetPortfolioOpenShortQuantityNET = CLng(ReadSummaryColumn(pseudoAccount, 20))
 End Function
 
 ' Retrieve portfolio open long quantity (Position category = NET).
 Public Function GetPortfolioOpenLongQuantityNET(pseudoAccount As String) As Long
-	GetPortfolioOpenLongQuantityNET = CLng(ReadSummaryColumn(pseudoAccount, 21))
+    GetPortfolioOpenLongQuantityNET = CLng(ReadSummaryColumn(pseudoAccount, 21))
 End Function
 
 ' *****************************************************************************
 ' ************************ PORTFOLIO SUMMARY FUNCTIONS - END ********************
 ' *****************************************************************************
+
