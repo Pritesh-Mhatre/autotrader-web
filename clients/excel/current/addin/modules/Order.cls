@@ -12,18 +12,18 @@ Option Explicit
 Const PLACE_ORDER_CMD As String = "PLACE_ORDER"
 
 Public Variety As Variety
-Public PseudoAccount As String
+Public pseudoAccount As String
 Public Exchange As String
 Public Symbol As String
 Public TradeType As TradeType
 Public OrderType As OrderType
 Public ProductType As ProductType
-Public Quantity As Integer
+Public Quantity As Long
 Public Price As Double
 Public TriggerPrice As Double
 Public Amo As Boolean
 Public Validity As Validity
-Public DisclosedQuantity As Integer
+Public DisclosedQuantity As Long
 Public PublisherId As String
 Public Target As Double
 Public Stoploss As Double
@@ -59,7 +59,7 @@ Public Function ToPlaceCommand() As String
     Dim cols(0 To 20) As String
 
     cols(0) = PLACE_ORDER_CMD
-    cols(1) = Me.PseudoAccount
+    cols(1) = Me.pseudoAccount
     cols(2) = Me.PublisherId
     cols(3) = Me.Variety.ToString
     cols(4) = Me.Exchange
