@@ -68,13 +68,7 @@ End Function
 
 Private Function GetIPCDirectory() As String
     
-    Dim Temp As String
-    Temp = Sheets("settings").Range("B2").Value
-    If (Trim(Temp) = "") Then
-        GetIPCDirectory = Environ("USERPROFILE") & Application.PathSeparator & "autotrader"
-    Else
-        GetIPCDirectory = Trim(Temp)
-    End If
+    GetIPCDirectory = Environ("USERPROFILE") & Application.PathSeparator & "autotrader"
 
 End Function
 
@@ -125,7 +119,7 @@ Public Function FileReadCsvColumnByRowId(FilePath As String, _
     
     On Error GoTo Done
     
-    Dim Temp As String
+    Dim temp As String
     Dim cols() As String
 
     FileReadCsvColumnByRowId = ""
@@ -133,8 +127,8 @@ Public Function FileReadCsvColumnByRowId(FilePath As String, _
     Open FilePath For Input As #1
     
     Do Until EOF(1)
-        Line Input #1, Temp
-        cols = Split(Temp, ",")
+        Line Input #1, temp
+        cols = Split(temp, ",")
         
         If cols(rowIdColumnIndex - 1) = rowId Then
             FileReadCsvColumnByRowId = cols(columnIndex - 1)
@@ -233,13 +227,13 @@ Public Function PlaceOrderAdvanced(Variety As String, _
     TradeType As String, _
     OrderType As String, _
     ProductType As String, _
-    Quantity As Integer, _
+    Quantity As Long, _
     Price As Double, _
     TriggerPrice As Double, _
     Target As Double, _
     Stoploss As Double, _
     TrailingStoploss As Double, _
-    DisclosedQuantity As Integer, _
+    DisclosedQuantity As Long, _
     Validity As String, _
     Amo As Boolean, _
     StrategyId As Integer, _
@@ -293,7 +287,7 @@ Public Function PlaceOrder( _
     TradeType As String, _
     OrderType As String, _
     ProductType As String, _
-    Quantity As Integer, _
+    Quantity As Long, _
     Price As Double, _
     TriggerPrice As Double) As String
         
@@ -301,7 +295,7 @@ Public Function PlaceOrder( _
     Dim Target As Double: Target = 0
     Dim Stoploss As Double: Stoploss = 0
     Dim TrailingStoploss As Double: TrailingStoploss = 0
-    Dim DisclosedQuantity As Integer: DisclosedQuantity = 0
+    Dim DisclosedQuantity As Long: DisclosedQuantity = 0
     Dim Validity As String: Validity = VALIDITY_DEFAULT
     Dim Amo As Boolean: Amo = False
     Dim StrategyId As Integer: StrategyId = -1
@@ -321,7 +315,7 @@ Public Function PlaceBracketOrder( _
     Symbol As String, _
     TradeType As String, _
     OrderType As String, _
-    Quantity As Integer, _
+    Quantity As Long, _
     Price As Double, _
     TriggerPrice As Double, _
     Target As Double, _
@@ -329,7 +323,7 @@ Public Function PlaceBracketOrder( _
     TrailingStoploss As Double) As String
 
     Dim Variety As String: Variety = VARIETY_BO
-    Dim DisclosedQuantity As Integer: DisclosedQuantity = 0
+    Dim DisclosedQuantity As Long: DisclosedQuantity = 0
     Dim Validity As String: Validity = VALIDITY_DEFAULT
     Dim Amo As Boolean: Amo = False
     Dim StrategyId As Integer: StrategyId = -1
@@ -350,12 +344,12 @@ Public Function PlaceCoverOrder( _
     Symbol As String, _
     TradeType As String, _
     OrderType As String, _
-    Quantity As Integer, _
+    Quantity As Long, _
     Price As Double, _
     TriggerPrice As Double) As String
 
     Dim Variety As String: Variety = VARIETY_CO
-    Dim DisclosedQuantity As Integer: DisclosedQuantity = 0
+    Dim DisclosedQuantity As Long: DisclosedQuantity = 0
     Dim Validity As String: Validity = VALIDITY_DEFAULT
     Dim Amo As Boolean: Amo = False
     Dim StrategyId As Integer: StrategyId = -1
@@ -476,7 +470,7 @@ End Function
 Public Function ModifyOrder(pseudoAccount As String, _
     orderId As String, _
     OrderType As String, _
-    Quantity As Integer, _
+    Quantity As Long, _
     Price As Double, _
     TriggerPrice As Double) As Boolean
         
@@ -525,7 +519,7 @@ End Function
 
 Public Function ModifyOrderQuantity(pseudoAccount As String, _
     orderId As String, _
-    Quantity As Integer) As Boolean
+    Quantity As Long) As Boolean
 
     ModifyOrderQuantity = ModifyOrder(pseudoAccount, orderId, "", Quantity, 0, 0)
 
@@ -619,7 +613,7 @@ Public Function isAutoTraderClientMonitoring() As Boolean
     
     CommandsFilePath = GetCommandsFilePath()
     isAutoTraderClientMonitoring = ValidateFile(CommandsFilePath, _
-        "AutoTrader client is not monitoring commands file. " & CommandsFilePath)
+        "AutoTrader client is not monitoring commands file." & CommandsFilePath)
 
 End Function
 
@@ -876,7 +870,7 @@ Public Function ReadPositionColumnInternal(pseudoAccount As String, _
     
     On Error GoTo Done
     
-    Dim Temp As String
+    Dim temp As String
     Dim cols() As String
     Dim FilePath As String
     
@@ -886,8 +880,8 @@ Public Function ReadPositionColumnInternal(pseudoAccount As String, _
     Open FilePath For Input As #1
     
     Do Until EOF(1)
-        Line Input #1, Temp
-        cols = Split(Temp, ",")
+        Line Input #1, temp
+        cols = Split(temp, ",")
         
         If (cols(categoryColumnIndex - 1) = category) And _
             (cols(typeColumnIndex - 1) = posType) And _
