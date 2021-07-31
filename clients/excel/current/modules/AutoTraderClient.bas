@@ -45,13 +45,13 @@ Sub PlaceOrders()
 			Dim TradeType As String: TradeType = Trim(wOrders.Cells(OrderRow, 4))
 			Dim OrderType As String: OrderType = Trim(wOrders.Cells(OrderRow, 6))
 			Dim ProductType As String: ProductType = Trim(wOrders.Cells(OrderRow, 5))
-			Dim Quantity As Integer: Quantity = wOrders.Cells(OrderRow, 7)
+			Dim Quantity As Long: Quantity = wOrders.Cells(OrderRow, 7)
 			Dim Price As Double: Price = wOrders.Cells(OrderRow, 8)
 			Dim TriggerPrice As Double: TriggerPrice = wOrders.Cells(OrderRow, 9)
 			Dim Target As Double: Target = wOrders.Cells(OrderRow, 10)
 			Dim Stoploss As Double: Stoploss = wOrders.Cells(OrderRow, 11)
 			Dim TrailingStoploss As Double: TrailingStoploss = wOrders.Cells(OrderRow, 12)
-			Dim DisclosedQuantity As Integer: DisclosedQuantity = 0
+			Dim DisclosedQuantity As Long: DisclosedQuantity = 0
 			Dim Validity As String: Validity = "DAY"
 			Dim Amo As Boolean: Amo = wOrders.Cells(OrderRow, 13)
 			Dim StrategyId As Integer: StrategyId = -1
