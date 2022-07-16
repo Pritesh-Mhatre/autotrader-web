@@ -930,7 +930,7 @@ Public Function GetPositionTradingAccount(pseudoAccount As String, _
         category, posType, independentExchange, independentSymbol, 2)
 End Function
 
-' Retrieve positions's MTM.
+' Retrieve positions's MTM (Mtm calculated by your stock broker).
 Public Function GetPositionMtm(pseudoAccount As String, _
     category As String, posType As String, independentExchange As String, _
     independentSymbol As String) As Double
@@ -938,12 +938,20 @@ Public Function GetPositionMtm(pseudoAccount As String, _
         category, posType, independentExchange, independentSymbol, 7))
 End Function
 
-' Retrieve positions's PNL.
+' Retrieve positions's PNL (Pnl calculated by your stock broker).
 Public Function GetPositionPnl(pseudoAccount As String, _
     category As String, posType As String, independentExchange As String, _
     independentSymbol As String) As Double
     GetPositionPnl = CDbl(ReadPositionColumn(pseudoAccount, _
         category, posType, independentExchange, independentSymbol, 8))
+End Function
+
+' Retrieve positions's AT PNL (Pnl calculated by AutoTrader Web).
+Public Function GetPositionAtPnl(pseudoAccount As String, _
+    category As String, posType As String, independentExchange As String, _
+    independentSymbol As String) As Double
+    GetPositionAtPnl = CDbl(ReadPositionColumn(pseudoAccount, _
+        category, posType, independentExchange, independentSymbol, 31))
 End Function
 
 ' Retrieve positions's buy quantity.
