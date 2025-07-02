@@ -32,6 +32,7 @@ Public Const VALIDITY_DEFAULT As String = VALIDITY_DAY
 Public Const PRODUCT_INTRADAY As String = "INTRADAY"
 Public Const PRODUCT_DELIVERY As String = "DELIVERY"
 Public Const PRODUCT_NORMAL As String = "NORMAL"
+Public Const PRODUCT_MTF As String = "MTF"
 
 Public Const MARGIN_EQUITY As String = "EQUITY"
 Public Const MARGIN_COMMODITY As String = "COMMODITY"
@@ -677,7 +678,7 @@ Public Function GetOrderOrderType(pseudoAccount As String, _
     GetOrderOrderType = ReadOrderColumn(pseudoAccount, orderId, 10)
 End Function
 
-' Retrieve order's product type (INTRADAY, DELIVERY, NORMAL).
+' Retrieve order's product type (INTRADAY, DELIVERY, NORMAL, MTF).
 Public Function GetOrderProductType(pseudoAccount As String, _
     orderId As String) As String
     GetOrderProductType = ReadOrderColumn(pseudoAccount, orderId, 11)

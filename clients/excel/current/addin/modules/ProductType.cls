@@ -12,10 +12,11 @@ Public Enum ProductTypeEnum
     INTRADAY
     DELIVERY
     NORMAL
+	MTF
 End Enum
 
 Private Const LoLimit = ProductTypeEnum.INTRADAY
-Private Const HiLimit = ProductTypeEnum.NORMAL
+Private Const HiLimit = ProductTypeEnum.MTF
 
 Private gen As ProductTypeEnum
 
@@ -41,6 +42,7 @@ Public Sub FromString(str As String)
         Case "I", "MIS", "INTRADAY": Me.Value = ProductTypeEnum.INTRADAY
                 Case "D", "CNC", "DELIVERY": Me.Value = ProductTypeEnum.DELIVERY
                 Case "NRML", "NORMAL": Me.Value = ProductTypeEnum.NORMAL
+                Case "MTF": Me.Value = ProductTypeEnum.MTF
         Case Else: Me.Value = ProductTypeEnum.INTRADAY
     End Select
 End Sub
@@ -52,6 +54,7 @@ Public Function ToString() As String
         Case ProductTypeEnum.INTRADAY: str = "INTRADAY"
         Case ProductTypeEnum.DELIVERY: str = "DELIVERY"
         Case ProductTypeEnum.NORMAL: str = "NORMAL"
+        Case ProductTypeEnum.MTF: str = "MTF"
         Case Else: str = "INTRADAY"
     End Select
     ToString = str
